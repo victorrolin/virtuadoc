@@ -67,19 +67,8 @@ export default function RegisterPage({
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-300" htmlFor="role">
-                Eu sou um...
-              </label>
-              <select 
-                name="role" 
-                className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none"
-                defaultValue="patient"
-              >
-                <option value="patient" className="bg-gray-900">Paciente</option>
-                <option value="doctor" className="bg-gray-900">Médico (Profissional de Saúde)</option>
-              </select>
-            </div>
+            {/* O campo de role foi removido. Todos os cadastros públicos são pacientes. */}
+            <input type="hidden" name="role" value="patient" />
 
             {searchParams?.message && (
               <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg text-center">

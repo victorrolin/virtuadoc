@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { updateAppointmentStatus } from '@/app/actions/appointmentStatus'
 
@@ -9,35 +10,23 @@ interface Props {
 }
 
 export function AppointmentActions({ appointmentId }: Props) {
+  const router = useRouter()
   const [loading, setLoading] = useState<'completed' | 'cancelled' | null>(null)
-  const [done, setDone] = useState<'completed' | 'cancelled' | null>(null)
 
   async function handle(status: 'completed' | 'cancelled') {
     if (!confirm(status === 'completed'
       ? 'Marcar esta consulta como concluída?'
-      : 'Cancelar esta consulta? O paciente será notificado.'))
+      : 'Cancelar esta consulta?'))
       return
 
     setLoading(status)
     const res = await updateAppointmentStatus(appointmentId, status)
     setLoading(null)
-    if (res.success) setDone(status)
-  }
 
-  if (done === 'completed') {
-    return (
-      <span className="text-xs px-3 py-1.5 bg-green-500/15 text-green-400 rounded-lg font-semibold flex items-center gap-1">
-        <CheckCircle2 className="h-3.5 w-3.5" /> Concluída
-      </span>
-    )
-  }
-
-  if (done === 'cancelled') {
-    return (
-      <span className="text-xs px-3 py-1.5 bg-red-500/15 text-red-400 rounded-lg font-semibold flex items-center gap-1">
-        <XCircle className="h-3.5 w-3.5" /> Cancelada
-      </span>
-    )
+    if (res.success) {
+      // Força re-fetch do Server Component — remove o card da lista imediatamente
+      router.refresh()
+    }
   }
 
   return (

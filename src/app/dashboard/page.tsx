@@ -21,6 +21,7 @@ export default async function DashboardPage() {
   // Buscar consultas de hoje e próximas (só para médicos)
   let todayCount = 0
   let nextAppointments: any[] = []
+  let completedTotal = 0
 
   if (isDoctor) {
     const { data: todayAppts } = await supabase
@@ -51,6 +52,14 @@ export default async function DashboardPage() {
       .limit(5)
 
     nextAppointments = upcoming || []
+
+    const { count } = await supabase
+      .from('appointments')
+      .select('id', { count: 'exact', head: true })
+      .eq('doctor_id', user!.id)
+      .eq('status', 'completed')
+
+    completedTotal = count || 0
   }
 
   function formatDate(dateStr: string, time: string) {
@@ -97,8 +106,8 @@ export default async function DashboardPage() {
             <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
               <Users className="h-6 w-6 text-green-400" />
             </div>
-            <div className="text-3xl font-bold text-white mb-1">—</div>
-            <div className="text-sm font-medium text-gray-400">Pacientes Atendidos</div>
+            <div className="text-3xl font-bold text-white mb-1">{completedTotal}</div>
+            <div className="text-sm font-medium text-gray-400">Consultas Concluídas</div>
           </div>
         )}
       </div>

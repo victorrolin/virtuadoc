@@ -47,12 +47,11 @@ export async function saveSchedule(formData: FormData) {
 
     if (error) {
       console.error('Error saving schedules:', error)
-      return { error: 'Falha ao salvar horários.' }
+      throw new Error('Falha ao salvar horários.')
     }
   }
 
   revalidatePath('/dashboard/agenda')
-  return { success: true }
 }
 
 export async function getSchedule() {

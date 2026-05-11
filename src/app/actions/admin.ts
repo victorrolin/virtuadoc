@@ -65,13 +65,13 @@ export async function createDoctor(formData: FormData) {
             .from('specialties')
             .upsert({ name: specName }, { onConflict: 'name' })
             .select('id')
-            .single()
+            .maybeSingle()
 
           if (specData) {
             specId = specData.id;
           } else {
             // Se o upsert não retornou
-            const { data: existingSpec } = await adminClient.from('specialties').select('id').eq('name', specName).single()
+            const { data: existingSpec } = await adminClient.from('specialties').select('id').eq('name', specName).maybeSingle()
             if (existingSpec) specId = existingSpec.id;
           }
 

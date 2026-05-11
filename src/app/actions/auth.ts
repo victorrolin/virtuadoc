@@ -16,7 +16,7 @@ export async function login(formData: FormData) {
   })
 
   if (error) {
-    return redirect('/login?message=Não foi possível autenticar o usuário')
+    return { error: 'E-mail ou senha incorretos.' }
   }
 
   revalidatePath('/', 'layout')

@@ -37,6 +37,11 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Liberar rota de callback do magic link (os tokens chegam no hash, sem cookies ainda)
+  if (request.nextUrl.pathname.startsWith('/auth/callback')) {
+    return supabaseResponse
+  }
+
   // Proteger rotas que começam com /dashboard
   if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
     const url = request.nextUrl.clone()

@@ -2,50 +2,48 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createBrowserClient } from '@supabase/ssr'
 import { Activity, Loader2 } from 'lucide-react'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const supabase = createClient()
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    )
 
-    // O Supabase client detecta automaticamente o hash/code na URL
-    // e troca pelos cookies de sessão
-    const handleCallback = async () => {
-      const { data, error } = await supabase.auth.getSession()
+    async function handleCallback() {
+      const searchParams = new URLSearchParams(window.location.search)
+      const next = searchParams.get('next') || '/dashboard/minhas-consultas'
 
-      if (error) {
-        console.error('Auth callback error:', error.message)
-        router.replace('/login?message=Link+expirado+ou+inválido.+Solicite+um+novo.')
-        return
-      }
+      // Extrair tokens do hash da URL (fluxo implícito do Supabase magic link)
+      const hash = window.location.hash.substring(1)
+      const hashParams = new URLSearchParams(hash)
+      const accessToken = hashParams.get('access_token')
+      const refreshToken = hashParams.get('refresh_token')
 
-      if (data.session) {
-        // Sessão estabelecida com sucesso — redirecionar para o destino
-        const params = new URLSearchParams(window.location.search)
-        const next = params.get('next') || '/dashboard/minhas-consultas'
-        router.replace(next)
-      } else {
-        // Aguardar o evento onAuthStateChange para pegar a sessão do hash
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-          if (event === 'SIGNED_IN' && session) {
-            subscription.unsubscribe()
-            const params = new URLSearchParams(window.location.search)
-            const next = params.get('next') || '/dashboard/minhas-consultas'
-            router.replace(next)
-          } else if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_OUT') {
-            subscription.unsubscribe()
-            router.replace('/login?message=Link+expirado.+Solicite+um+novo.')
-          }
+      if (accessToken && refreshToken) {
+        // Tokens encontrados no hash — estabelecer sessão manualmente
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
         })
-
-        // Timeout de segurança — se não autenticar em 10s, redireciona para login
-        setTimeout(() => {
-          subscription.unsubscribe()
-          router.replace('/login?message=Tempo+esgotado.+Tente+novamente.')
-        }, 10000)
+        if (error) {
+          console.error('setSession error:', error.message)
+          router.replace('/login?message=Link+inválido+ou+expirado.+Solicite+um+novo.')
+        } else {
+          router.replace(next)
+        }
+      } else {
+        // Sem hash — verificar se já há sessão ativa (ex: PKCE)
+        const { data } = await supabase.auth.getSession()
+        if (data.session) {
+          router.replace(next)
+        } else {
+          router.replace('/login?message=Link+expirado.+Solicite+um+novo+acesso.')
+        }
       }
     }
 

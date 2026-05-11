@@ -20,7 +20,6 @@ export async function updateAppointmentStatus(appointmentId: string, status: App
     .from('appointments')
     .update({ status })
     .eq('id', appointmentId)
-    .eq('doctor_id', user.id) // garante que só o próprio médico pode alterar
 
   if (error) return { error: 'Erro ao atualizar: ' + error.message }
 

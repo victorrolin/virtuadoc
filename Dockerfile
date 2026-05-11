@@ -19,6 +19,9 @@ COPY . .
 # Next.js telemetry is disabled
 ENV NEXT_TELEMETRY_DISABLED=1
 
+ENV NEXT_PUBLIC_SUPABASE_URL=https://vghfzvevlfxtpitmqmsv.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnaGZ6dmV2bGZ4dHBpdG1xbXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc5MjEzOTcsImV4cCI6MjA1MzQ5NzM5N30.Mj19WhQZdr6ESn9_umCZGwXCdC-knHao89hYMaohmag
+
 RUN npm run build
 
 # Production image, copy all the files and run next

@@ -105,7 +105,7 @@ function CheckoutContent() {
           </Link>
           <div className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-white">Lumina<span className="text-gradient">Health</span></span>
+            <span className="text-lg font-bold text-white">Virtua<span className="text-gradient">Doctor</span></span>
           </div>
           <div className="text-xs text-gray-500">Checkout Seguro 🔒</div>
         </div>

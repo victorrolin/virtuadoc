@@ -19,7 +19,7 @@ export default async function MedicosPage() {
           <Link href="/" className="flex items-center gap-2">
             <Activity className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold tracking-tight text-white">
-              Lumina<span className="text-gradient">Health</span>
+              Virtua<span className="text-gradient">Doctor</span>
             </span>
           </Link>
           <Link href="/dashboard" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Meu Painel</Link>

@@ -37,7 +37,7 @@ export default async function DashboardLayout({
           <Link href="/" className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-primary" />
             <span className="text-lg font-bold tracking-tight text-white">
-              Lumina<span className="text-gradient">Health</span>
+              Virtua<span className="text-gradient">Doctor</span>
             </span>
           </Link>
         </div>

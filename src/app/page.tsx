@@ -39,7 +39,7 @@ export default async function Home() {
           <div className="flex items-center gap-2">
             <Activity className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold tracking-tight text-white">
-              Lumina<span className="text-gradient">Health</span>
+              Virtua<span className="text-gradient">Doctor</span>
             </span>
           </div>
           <nav className="hidden md:flex gap-8">
@@ -218,7 +218,7 @@ export default async function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Por que escolher a LuminaHealth?</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Por que escolher a VirtuaDoctor?</h2>
                 <div className="space-y-5">
                   {[
                     { icon: Clock, title: 'Atendimento Imediato', desc: 'Sem filas, sem espera. Agenda disponível 7 dias por semana.', color: 'text-primary' },
@@ -310,7 +310,7 @@ export default async function Home() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Activity className="h-6 w-6 text-primary" />
-                <span className="text-lg font-bold text-white">Lumina<span className="text-gradient">Health</span></span>
+                <span className="text-lg font-bold text-white">Virtua<span className="text-gradient">Doctor</span></span>
               </div>
               <p className="text-gray-500 text-sm">Telemedicina premium para quem valoriza saúde e tempo.</p>
             </div>
@@ -326,7 +326,7 @@ export default async function Home() {
               <h4 className="text-white font-semibold mb-3">Suporte</h4>
               <div className="space-y-2 text-sm text-gray-500">
                 <div><Link href="#faq" className="hover:text-white transition-colors">FAQ</Link></div>
-                <div><a href="mailto:suporte@luminahealth.com.br" className="hover:text-white transition-colors">Contato</a></div>
+                <div><a href="mailto:suporte@VirtuaDoctor.com.br" className="hover:text-white transition-colors">Contato</a></div>
               </div>
             </div>
             <div>
@@ -339,7 +339,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="border-t border-white/5 pt-6 text-center text-sm text-gray-600">
-            © 2026 LuminaHealth. Todos os direitos reservados. · CFM · Telemedicina regulamentada no Brasil
+            © 2026 VirtuaDoctor. Todos os direitos reservados. · CFM · Telemedicina regulamentada no Brasil
           </div>
         </div>
       </footer>

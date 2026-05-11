@@ -33,7 +33,7 @@ export default async function DoctorProfilePage({
           </Link>
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold tracking-tight text-white">
-              Lumina<span className="text-gradient">Health</span>
+              Virtua<span className="text-gradient">Doctor</span>
             </span>
           </div>
         </div>

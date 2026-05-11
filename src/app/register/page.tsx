@@ -17,7 +17,7 @@ export default function RegisterPage({
           <Link href="/" className="flex items-center gap-2 group mb-8">
             <Activity className="h-10 w-10 text-primary group-hover:scale-110 transition-transform" />
             <span className="text-2xl font-bold tracking-tight text-white">
-              Lumina<span className="text-gradient">Health</span>
+              Virtua<span className="text-gradient">Doctor</span>
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-white mb-2">Crie sua conta</h1>

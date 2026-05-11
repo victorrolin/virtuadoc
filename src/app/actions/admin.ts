@@ -20,36 +20,39 @@ export async function createDoctor(formData: FormData) {
   const price = formData.get('price') as string
   const specialtiesRaw = formData.get('specialties') as string
 
-  // 2. Create the user using the Service Role Key
-  const adminClient = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
+  try {
+    // 2. Create the user using the Service Role Key
+    const adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    )
 
-  const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: fullName,
-      role: 'doctor'
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        role: 'doctor'
+      }
+    })
+
+    if (authError) {
+      return { error: 'Falha Auth: ' + authError.message }
     }
-  })
 
-  if (authError) {
-    return { error: 'Falha ao criar médico: ' + authError.message }
-  }
+    // 3. Update or Create the profile safely (bypasses any trigger failures)
+    if (authData?.user) {
+      const { error: upsertProfErr } = await adminClient.from('profiles').upsert({
+        id: authData.user.id,
+        full_name: fullName,
+        role: 'doctor',
+        crm: crm,
+        price_per_consultation: price ? parseFloat(price) : null
+      }, { onConflict: 'id' })
 
-  // 3. Update or Create the profile safely (bypasses any trigger failures)
-  if (authData.user) {
-     await adminClient.from('profiles').upsert({
-       id: authData.user.id,
-       full_name: fullName,
-       role: 'doctor',
-       crm: crm,
-       price_per_consultation: price ? parseFloat(price) : null
-     }, { onConflict: 'id' })
+      if (upsertProfErr) return { error: 'Erro Profile: ' + upsertProfErr.message }
 
       // 4. Inserir especialidades
       if (specialtiesRaw) {
@@ -58,7 +61,7 @@ export async function createDoctor(formData: FormData) {
         for (const specName of specialtiesList) {
           let specId = null;
           // Tenta fazer upsert
-          const { data: specData } = await adminClient
+          const { data: specData, error: specErr } = await adminClient
             .from('specialties')
             .upsert({ name: specName }, { onConflict: 'name' })
             .select('id')
@@ -67,24 +70,30 @@ export async function createDoctor(formData: FormData) {
           if (specData) {
             specId = specData.id;
           } else {
-            // Se o upsert não retornou (pode acontecer em conflitos que não atualizam nada), buscamos manualmente
+            // Se o upsert não retornou
             const { data: existingSpec } = await adminClient.from('specialties').select('id').eq('name', specName).single()
             if (existingSpec) specId = existingSpec.id;
           }
 
           if (specId) {
-            // Associa o médico à especialidade (com upsert pra evitar erro se clicou duas vezes)
-            await adminClient.from('doctor_specialties').upsert({
+            // Associa o médico à especialidade
+            const { error: dsErr } = await adminClient.from('doctor_specialties').upsert({
               doctor_id: authData.user.id,
               specialty_id: specId
             }, { onConflict: 'doctor_id, specialty_id' })
+            if (dsErr) return { error: 'Erro Assoc Spec: ' + dsErr.message }
+          } else {
+            return { error: 'Erro Especialidade: Não foi possível obter o ID para ' + specName }
           }
         }
       }
-   }
+    }
 
-   revalidatePath('/dashboard/admin')
-   return { success: true }
+    revalidatePath('/dashboard/admin')
+    return { success: true }
+  } catch (err: any) {
+    return { error: 'Exceção Crítica: ' + err.message }
+  }
 }
 
 export async function deleteDoctor(doctorId: string) {

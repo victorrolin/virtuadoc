@@ -1,5 +1,6 @@
 import { AdminDoctorForm } from '@/components/AdminDoctorForm'
 import { DeleteDoctorButton } from '@/components/DeleteDoctorButton'
+import { AdminAccountSettings } from '@/components/AdminAccountSettings'
 import { createClient } from '@/lib/supabase/server'
 import { ShieldCheck, Users } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -83,6 +84,20 @@ export default async function AdminPage() {
         </div>
 
       </div>
+
+      {/* Configurações de conta */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <AdminAccountSettings />
+        <div className="lg:col-span-2 glass p-6 rounded-2xl border border-white/5 flex flex-col justify-center gap-3">
+          <h3 className="text-white font-semibold">💡 Sobre administradores</h3>
+          <ul className="text-gray-400 text-sm space-y-2 list-disc list-inside">
+            <li>Admins criados aqui podem acessar o painel com e-mail e senha</li>
+            <li>Cada admin pode trocar sua própria senha nesta seção</li>
+            <li>Admins têm acesso total ao painel, incluindo criação de médicos</li>
+          </ul>
+        </div>
+      </div>
+
     </div>
   )
 }

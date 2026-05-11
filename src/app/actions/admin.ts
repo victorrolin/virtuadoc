@@ -41,12 +41,15 @@ export async function createDoctor(formData: FormData) {
     return { error: 'Falha ao criar médico: ' + authError.message }
   }
 
-  // 3. Update the CRM and Price in the profiles table
+  // 3. Update or Create the profile safely (bypasses any trigger failures)
   if (authData.user) {
-     await adminClient.from('profiles').update({
+     await adminClient.from('profiles').upsert({
+       id: authData.user.id,
+       full_name: fullName,
+       role: 'doctor',
        crm: crm,
        price_per_consultation: price ? parseFloat(price) : null
-     }).eq('id', authData.user.id)
+     }, { onConflict: 'id' })
 
      // 4. Inserir especialidades
      if (specialtiesRaw) {

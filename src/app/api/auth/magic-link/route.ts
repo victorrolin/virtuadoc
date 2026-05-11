@@ -10,6 +10,10 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.RESEND_API_KEY
     const fromAddress = process.env.RESEND_FROM_EMAIL || 'noreply@virtuadoc.automatech.tech'
 
+    // Redirecionar para /auth/callback que vai estabelecer a sessão
+    // antes do middleware interceptar a rota protegida /dashboard
+    const callbackUrl = `${appUrl}/auth/callback?next=/dashboard/minhas-consultas`
+
     // Usar Admin API para gerar o link (bypassa o Site URL do Supabase)
     const adminClient = createAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +25,7 @@ export async function POST(req: NextRequest) {
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${appUrl}/dashboard/minhas-consultas`,
+        redirectTo: callbackUrl,
       },
     })
 
@@ -38,9 +42,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Erro ao gerar link.' }, { status: 500 })
     }
 
-    // Corrigir o redirect_to que o Supabase coloca como localhost
-    // (acontece quando Site URL do projeto não está configurado)
-    const redirectTarget = encodeURIComponent(`${appUrl}/dashboard/minhas-consultas`)
+    // Corrigir o redirect_to que o Supabase pode colocar como localhost
+    const redirectTarget = encodeURIComponent(callbackUrl)
     magicLink = magicLink.replace(
       /redirect_to=[^&]*/,
       `redirect_to=${redirectTarget}`

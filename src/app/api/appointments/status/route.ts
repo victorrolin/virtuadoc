@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -9,6 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Dados inválidos.' }, { status: 400 })
     }
 
+    // Verificar autenticação com o cliente normal
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -23,16 +25,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 })
     }
 
-    const { error } = await supabase
+    // Usar cliente admin para contornar RLS
+    const adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+
+    const { error, count } = await adminClient
       .from('appointments')
       .update({ status })
       .eq('id', appointmentId)
+      .select('id', { count: 'exact' })
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, updated: count })
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Erro interno.' }, { status: 500 })
   }

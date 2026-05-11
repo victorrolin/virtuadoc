@@ -67,7 +67,7 @@ function LoginForm() {
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === 'magic' ? 'bg-primary text-black' : 'text-gray-400 hover:text-white'}`}
         >
           <Sparkles className="h-4 w-4" />
-          Acesso sem senha
+          Sou Paciente
         </button>
         <button
           type="button"
@@ -75,7 +75,7 @@ function LoginForm() {
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === 'password' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}
         >
           <Lock className="h-4 w-4" />
-          Senha
+          Sou Médico / Admin
         </button>
       </div>
 
@@ -101,8 +101,8 @@ function LoginForm() {
           ) : (
             <form onSubmit={handleMagicLink} className="flex flex-col gap-4">
               <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 text-sm text-gray-400 leading-relaxed">
-                <p className="text-primary font-semibold mb-1">✨ Acesso rápido para pacientes</p>
-                Digite o e-mail usado no agendamento e enviaremos um link direto para suas consultas — sem precisar de senha.
+                <p className="text-primary font-semibold mb-1">✨ Acesso para pacientes</p>
+                Pacientes não precisam de senha! Digite o e-mail usado no agendamento e enviaremos um link direto para suas consultas.
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-300">E-mail do agendamento</label>

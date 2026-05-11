@@ -148,6 +148,9 @@ export async function sendConfirmationEmail(params: SendConfirmationEmailParams)
   `
 
   try {
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'noreply@virtuadoc.automatech.tech'
+    const fromWithName = `VirtuaDoctor <${fromAddress}>`
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -155,10 +158,15 @@ export async function sendConfirmationEmail(params: SendConfirmationEmailParams)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: fromEmail,
+        from: fromWithName,
         to: [to],
-        subject: `✅ Consulta confirmada com ${doctorName} – ${formattedDate} às ${time}`,
+        reply_to: fromAddress,
+        subject: `Consulta confirmada com ${doctorName} - ${formattedDate} as ${time}`,
         html,
+        text: `CONSULTA CONFIRMADA!\n\nOla, ${patientName}!\n\nSeu pagamento foi confirmado.\n\nMedico: ${doctorName} (${specialty})\nData: ${formattedDate} as ${time}\nLink da videochamada: ${meetLink}\n\nAcesse o link no horario agendado.\n\nDuvidas? suporte@virtuadoc.automatech.tech\nVirtuaDoctor - Telemedicina Premium`,
+        headers: {
+          'X-Entity-Ref-ID': `appt-${Date.now()}`,
+        },
       }),
     })
 

@@ -89,7 +89,7 @@ export default async function DoctorProfilePage({
                     {day.slots.map((time) => (
                       <Link 
                         key={time} 
-                        href={`/checkout?doctor=${doctor.id}&date=${day.date}&time=${time}`}
+                        href={`/checkout?doctor=${doctor.id}&date=${day.date}&time=${time}&name=${encodeURIComponent(doctor.full_name)}&specialty=${encodeURIComponent(doctor.specialties || '')}&price=${doctor.price_per_consultation || 0}`}
                         className="bg-white/5 hover:bg-primary hover:text-black border border-white/10 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
                       >
                         {time}

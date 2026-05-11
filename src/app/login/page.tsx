@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Activity, ArrowRight, Loader2, Mail, Lock, Sparkles, CheckCircle2 } from 'lucide-react'
-import { login, sendMagicLink } from '@/app/actions/auth'
+import { login } from '@/app/actions/auth'
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
@@ -34,9 +34,23 @@ function LoginForm() {
     setErrorMsg('')
     try {
       const formData = new FormData(e.currentTarget)
-      const res = await sendMagicLink(formData)
-      if (res?.error) { setErrorMsg(res.error); setLoading(false) }
-      else { setMagicSent(true); setLoading(false) }
+      const email = formData.get('email') as string
+
+      // Chamar nossa API customizada (gera link via Admin + envia pelo Resend)
+      const res = await fetch('/api/auth/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        setErrorMsg(data.error || 'Erro ao enviar o link. Tente novamente.')
+        setLoading(false)
+      } else {
+        setMagicSent(true)
+        setLoading(false)
+      }
     } catch (err: any) {
       setErrorMsg('Erro de conexão. Tente novamente.')
       setLoading(false)

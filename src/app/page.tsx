@@ -11,11 +11,18 @@ export default async function Home() {
     .eq('role', 'doctor')
     .limit(6)
 
-  // Extrair especialidades únicas dos médicos
-  const allSpecs = doctors?.flatMap(d => 
+  // Extrair especialidades únicas (case-insensitive)
+  const allSpecs = doctors?.flatMap(d =>
     d.specialties ? d.specialties.split(',').map((s: string) => s.trim()) : []
   ) || []
-  const uniqueSpecs = [...new Set(allSpecs)].slice(0, 8)
+  // Deduplica ignorando maiúsculas/minúsculas, mantendo a primeira ocorrência
+  const seen = new Set<string>()
+  const uniqueSpecs = allSpecs.filter(s => {
+    const key = s.toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  }).slice(0, 8)
 
   const specIcons: Record<string, string> = {
     'Clínico Geral': '🩺', 'Psiquiatra': '🧠', 'Psicólogo': '💭',

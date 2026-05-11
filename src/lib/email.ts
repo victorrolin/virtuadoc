@@ -184,3 +184,109 @@ export async function sendConfirmationEmail(params: SendConfirmationEmailParams)
     return { success: false, error: err.message }
   }
 }
+
+// ──────────────────────────────────────────
+// Notificação para o MÉDICO quando há nova consulta
+// ──────────────────────────────────────────
+interface SendDoctorNotificationParams {
+  to: string
+  doctorName: string
+  patientName: string
+  patientPhone: string
+  date: string
+  time: string
+  meetLink: string
+  reason?: string
+}
+
+export async function sendDoctorNotificationEmail(params: SendDoctorNotificationParams) {
+  const { to, doctorName, patientName, patientPhone, date, time, meetLink, reason } = params
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) return { success: false }
+
+  const fromAddress = process.env.RESEND_FROM_EMAIL || 'noreply@virtuadoc.automatech.tech'
+  const formattedDate = formatDate(date)
+
+  const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"/><title>Nova Consulta Agendada</title></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:16px 16px 0 0;padding:32px;text-align:center;">
+            <h1 style="margin:0;color:#fff;font-size:26px;font-weight:800;">📅 Nova Consulta Agendada!</h1>
+            <p style="margin:8px 0 0;color:#e9d5ff;font-size:14px;">Um paciente agendou uma consulta com você</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#141414;padding:32px;border-left:1px solid #222;border-right:1px solid #222;">
+            <p style="color:#ccc;font-size:16px;margin:0 0 24px;">Olá, <strong style="color:#fff;">Dr(a). ${doctorName}</strong>! 👋</p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;margin-bottom:24px;">
+              <tr><td style="padding:20px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr><td style="padding:8px 0;border-bottom:1px solid #222;">
+                    <span style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;">Paciente</span><br/>
+                    <span style="color:#fff;font-size:16px;font-weight:600;">${patientName}</span>
+                  </td></tr>
+                  <tr><td style="padding:8px 0;border-bottom:1px solid #222;">
+                    <span style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;">Telefone</span><br/>
+                    <span style="color:#fff;font-size:15px;">📱 ${patientPhone || 'Não informado'}</span>
+                  </td></tr>
+                  <tr><td style="padding:8px 0;border-bottom:1px solid #222;">
+                    <span style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;">Data e Hora</span><br/>
+                    <span style="color:#fff;font-size:15px;font-weight:600;">📅 ${formattedDate} às ${time}</span>
+                  </td></tr>
+                  ${reason ? `<tr><td style="padding:8px 0;border-bottom:1px solid #222;">
+                    <span style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;">Motivo da Consulta</span><br/>
+                    <span style="color:#aaa;font-size:14px;">${reason}</span>
+                  </td></tr>` : ''}
+                  <tr><td style="padding:8px 0;">
+                    <span style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;">Link da Sala</span><br/>
+                    <a href="${meetLink}" style="color:#a855f7;font-size:13px;word-break:break-all;">${meetLink}</a>
+                  </td></tr>
+                </table>
+              </td></tr>
+            </table>
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr><td align="center">
+                <a href="${meetLink}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:800;font-size:15px;padding:14px 36px;border-radius:100px;text-decoration:none;">
+                  Abrir Sala da Consulta
+                </a>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#111;border-radius:0 0 16px 16px;border:1px solid #222;border-top:0;padding:16px;text-align:center;">
+            <p style="color:#444;font-size:11px;margin:0;">VirtuaDoctor – Telemedicina Premium</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: `VirtuaDoctor <${fromAddress}>`,
+        to: [to],
+        subject: `Nova consulta agendada - ${patientName} - ${formattedDate} as ${time}`,
+        html,
+        text: `Nova consulta agendada!\n\nPaciente: ${patientName}\nTelefone: ${patientPhone}\nData: ${formattedDate} as ${time}\nLink: ${meetLink}`,
+      }),
+    })
+    const data = await res.json()
+    if (!res.ok) { console.error('Doctor email error:', data); return { success: false } }
+    console.log('✅ E-mail médico enviado | ID:', data.id)
+    return { success: true }
+  } catch (err: any) {
+    console.error('Doctor email error:', err)
+    return { success: false }
+  }
+}

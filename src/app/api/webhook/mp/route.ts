@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { sendConfirmationEmail } from '@/lib/email'
+import { sendConfirmationEmail, sendDoctorNotificationEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,12 +77,16 @@ export async function POST(req: NextRequest) {
       payment_id: String(paymentId),
     })
 
-    // Buscar nome do médico para o e-mail
+    // Buscar nome e email do médico
     const { data: doctorProfile } = await adminClient
       .from('profiles')
       .select('full_name, specialties')
       .eq('id', meta.doctor_id)
       .single()
+
+    // Buscar email do médico no Auth
+    const { data: doctorAuth } = await adminClient.auth.admin.getUserById(meta.doctor_id)
+    const doctorEmail = doctorAuth?.user?.email
 
     // Enviar e-mail de confirmação para o paciente
     await sendConfirmationEmail({
@@ -94,6 +98,20 @@ export async function POST(req: NextRequest) {
       time: meta.appointment_time,
       meetLink: meta.meet_link,
     })
+
+    // Enviar notificação para o médico
+    if (doctorEmail) {
+      await sendDoctorNotificationEmail({
+        to: doctorEmail,
+        doctorName: doctorProfile?.full_name || 'Médico',
+        patientName: meta.patient_name,
+        patientPhone: meta.patient_phone || '',
+        date: meta.appointment_date,
+        time: meta.appointment_time,
+        meetLink: meta.meet_link,
+        reason: meta.reason,
+      })
+    }
 
     return NextResponse.json({ ok: true })
   } catch (err: any) {

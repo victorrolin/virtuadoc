@@ -7,14 +7,15 @@ import { notFound } from 'next/navigation'
 export default async function DoctorProfilePage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const { data: doctor } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('role', 'doctor')
     .single()
 

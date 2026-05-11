@@ -255,10 +255,18 @@ function CheckoutContent() {
                   ))}
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-6">
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-4">
                   <p className="text-xs text-gray-400 text-center">
-                    🔒 Pagamento processado com segurança pelo <strong className="text-white">Mercado Pago</strong>. 
+                    🔒 Pagamento processado com segurança pelo <strong className="text-white">Mercado Pago</strong>.
                     Seus dados financeiros nunca são armazenados em nossos servidores.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 mb-6 text-left">
+                  <p className="text-xs text-primary font-semibold mb-1">📧 Como funciona após o pagamento:</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Após confirmar o pagamento, você receberá um <strong className="text-white">e-mail com o link da videochamada</strong> e todos os detalhes da consulta. 
+                    Para Pix, pode levar até 5 minutos para a confirmação chegar.
                   </p>
                 </div>
 

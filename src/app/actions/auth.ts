@@ -55,3 +55,30 @@ export async function signOut() {
   await supabase.auth.signOut()
   return redirect('/')
 }
+
+export async function sendMagicLink(formData: FormData) {
+  const supabase = await createClient()
+  const email = formData.get('email') as string
+
+  if (!email) return { error: 'Informe seu e-mail.' }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: `${appUrl}/dashboard/minhas-consultas`,
+      shouldCreateUser: false, // Só acessa se já tiver conta (paciente criado via webhook)
+    },
+  })
+
+  if (error) {
+    // Se o usuário não existe, mostrar mensagem amigável
+    if (error.message.includes('not found') || error.message.includes('Email not confirmed')) {
+      return { error: 'E-mail não encontrado. Verifique se usou o mesmo e-mail do agendamento.' }
+    }
+    return { error: 'Não foi possível enviar o link. Tente novamente.' }
+  }
+
+  return { success: true }
+}

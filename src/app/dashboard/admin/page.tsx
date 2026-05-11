@@ -76,6 +76,8 @@ export default async function AdminPage() {
                   </div>
                 )
               })
+            ) : (
+              <p className="text-gray-400 text-sm">Nenhum médico cadastrado ainda.</p>
             )}
           </div>
         </div>

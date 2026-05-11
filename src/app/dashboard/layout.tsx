@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
+import { BackButton } from '@/components/BackButton'
 
 export default async function DashboardLayout({
   children,
@@ -116,6 +117,7 @@ export default async function DashboardLayout({
           </form>
         </header>
         <div className="p-8">
+          <BackButton />
           {children}
         </div>
       </main>

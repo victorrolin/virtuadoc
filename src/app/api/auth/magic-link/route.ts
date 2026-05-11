@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     // Garantir que o domínio base seja o do Supabase (não localhost)
     magicLink = magicLink.replace(
       /^https?:\/\/localhost:\d+/,
-      process.env.NEXT_PUBLIC_SUPABASE_URL
+      process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://vghfzvevlfxtpitmqmsv.supabase.co'
     )
 
     if (!apiKey) {

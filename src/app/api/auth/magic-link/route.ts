@@ -33,10 +33,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Não foi possível gerar o link. Tente novamente.' }, { status: 500 })
     }
 
-    const magicLink = data.properties?.action_link
+    let magicLink = data.properties?.action_link
     if (!magicLink) {
       return NextResponse.json({ error: 'Erro ao gerar link.' }, { status: 500 })
     }
+
+    // Corrigir o redirect_to que o Supabase coloca como localhost
+    // (acontece quando Site URL do projeto não está configurado)
+    const redirectTarget = encodeURIComponent(`${appUrl}/dashboard/minhas-consultas`)
+    magicLink = magicLink.replace(
+      /redirect_to=[^&]*/,
+      `redirect_to=${redirectTarget}`
+    )
+    // Garantir que o domínio base seja o do Supabase (não localhost)
+    magicLink = magicLink.replace(
+      /^https?:\/\/localhost:\d+/,
+      process.env.NEXT_PUBLIC_SUPABASE_URL
+    )
 
     if (!apiKey) {
       console.warn('RESEND_API_KEY não configurada')

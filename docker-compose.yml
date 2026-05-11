@@ -1,23 +1,38 @@
 version: '3.8'
 
 services:
-  lumina-health:
+  virtuadoc:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: lumina-health-app
-    restart: always
-    ports:
-      - "3000:3000"
+    image: virtuadoc-app:latest
+    networks:
+      - typebotnet
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
-    networks:
-      - proxy-tier
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.virtuadoc.rule=Host(`virtuadoc.automatech.tech`)
+        - traefik.http.routers.virtuadoc.entrypoints=websecure
+        - traefik.http.routers.virtuadoc.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.virtuadoc.service=virtuadoc
+        - traefik.http.services.virtuadoc.loadbalancer.server.port=3000
+        - traefik.http.services.virtuadoc.loadbalancer.passHostHeader=1
 
 networks:
-  proxy-tier:
-    name: proxy-tier
+  typebotnet:
     external: true
+    name: typebotnet

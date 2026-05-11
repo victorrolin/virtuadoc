@@ -42,51 +42,18 @@ export async function createDoctor(formData: FormData) {
       return { error: 'Falha Auth: ' + authError.message }
     }
 
-    // 3. Update or Create the profile safely (bypasses any trigger failures)
+    // 3. Update or Create the profile safely
     if (authData?.user) {
       const { error: upsertProfErr } = await adminClient.from('profiles').upsert({
         id: authData.user.id,
         full_name: fullName,
         role: 'doctor',
         crm: crm,
-        price_per_consultation: price ? parseFloat(price) : null
+        price_per_consultation: price ? parseFloat(price) : null,
+        specialties: specialtiesRaw // Gravando direto na nova coluna
       }, { onConflict: 'id' })
 
       if (upsertProfErr) return { error: 'Erro Profile: ' + upsertProfErr.message }
-
-      // 4. Inserir especialidades
-      if (specialtiesRaw) {
-        const specialtiesList = specialtiesRaw.split(',').map(s => s.trim()).filter(Boolean)
-        
-        for (const specName of specialtiesList) {
-          let specId = null;
-          // Tenta fazer upsert
-          const { data: specData, error: specErr } = await adminClient
-            .from('specialties')
-            .upsert({ name: specName }, { onConflict: 'name' })
-            .select('id')
-            .maybeSingle()
-
-          if (specData) {
-            specId = specData.id;
-          } else {
-            // Se o upsert não retornou
-            const { data: existingSpec } = await adminClient.from('specialties').select('id').eq('name', specName).maybeSingle()
-            if (existingSpec) specId = existingSpec.id;
-          }
-
-          if (specId) {
-            // Associa o médico à especialidade
-            const { error: dsErr } = await adminClient.from('doctor_specialties').upsert({
-              doctor_id: authData.user.id,
-              specialty_id: specId
-            }, { onConflict: 'doctor_id, specialty_id' })
-            if (dsErr) return { error: 'Erro Assoc Spec: ' + dsErr.message }
-          } else {
-            return { error: 'Erro Especialidade: Não foi possível obter o ID para ' + specName }
-          }
-        }
-      }
     }
 
     revalidatePath('/dashboard/admin')

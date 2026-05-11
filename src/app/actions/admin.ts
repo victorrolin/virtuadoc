@@ -18,6 +18,7 @@ export async function createDoctor(formData: FormData) {
   const fullName = formData.get('full_name') as string
   const crm = formData.get('crm') as string
   const price = formData.get('price') as string
+  const specialtiesRaw = formData.get('specialties') as string
 
   // 2. Create the user using the Service Role Key
   const adminClient = createAdminClient(
@@ -32,26 +33,44 @@ export async function createDoctor(formData: FormData) {
     email_confirm: true,
     user_metadata: {
       full_name: fullName,
-      role: 'doctor' // The trigger handle_new_user will pick this up
+      role: 'doctor'
     }
   })
 
   if (authError) {
-    console.error('Auth Error:', authError)
-    throw new Error('Falha ao criar usuário do médico.')
+    return { error: 'Falha ao criar médico: ' + authError.message }
   }
 
   // 3. Update the CRM and Price in the profiles table
   if (authData.user) {
-     const { error: profileError } = await adminClient.from('profiles').update({
+     await adminClient.from('profiles').update({
        crm: crm,
        price_per_consultation: price ? parseFloat(price) : null
      }).eq('id', authData.user.id)
 
-     if (profileError) {
-       console.error('Profile Update Error:', profileError)
+     // 4. Inserir especialidades
+     if (specialtiesRaw) {
+       const specialtiesList = specialtiesRaw.split(',').map(s => s.trim()).filter(Boolean)
+       
+       for (const specName of specialtiesList) {
+         // Upsert: Cria a especialidade se não existir (baseado no nome único)
+         const { data: specData } = await adminClient
+           .from('specialties')
+           .upsert({ name: specName }, { onConflict: 'name' })
+           .select()
+           .single()
+
+         if (specData) {
+           // Associa o médico à especialidade
+           await adminClient.from('doctor_specialties').insert({
+             doctor_id: authData.user.id,
+             specialty_id: specData.id
+           })
+         }
+       }
      }
   }
 
   revalidatePath('/dashboard/admin')
+  return { success: true }
 }

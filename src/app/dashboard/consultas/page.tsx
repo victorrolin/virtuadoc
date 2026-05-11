@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Video, Calendar, Clock, User, FileText, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { AppointmentActions } from '@/components/AppointmentActions'
 
 export default async function ConsultasPage() {
   const supabase = await createClient()
@@ -30,6 +31,7 @@ export default async function ConsultasPage() {
       status,
       meeting_link,
       reason,
+      notes,
       patient:profiles!appointments_patient_id_fkey(full_name, phone)
     `)
     .eq('doctor_id', user.id)
@@ -148,23 +150,34 @@ export default async function ConsultasPage() {
                           </p>
                         </div>
                       )}
+                      {(appt as any).notes && (
+                        <div className="mt-1 flex items-start gap-1.5 bg-yellow-500/5 rounded-lg px-3 py-2 border border-yellow-500/10">
+                          <FileText className="h-3.5 w-3.5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                          <p className="text-xs text-gray-300 leading-relaxed">
+                            <span className="font-semibold text-yellow-400">Obs: </span>{(appt as any).notes}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <a
-                    href={meetLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex-shrink-0 ${
-                      active
-                        ? 'bg-primary text-black hover:bg-primary/90 shadow-[0_0_15px_rgba(0,242,254,0.3)]'
-                        : 'bg-white/10 text-white hover:bg-white/20'
-                    }`}
-                  >
-                    <Video className="h-4 w-4" />
-                    {active ? 'Entrar Agora' : 'Abrir Sala'}
-                    <ExternalLink className="h-3.5 w-3.5 opacity-70" />
-                  </a>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-shrink-0">
+                    <AppointmentActions appointmentId={appt.id} />
+                    <a
+                      href={meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex-shrink-0 ${
+                        active
+                          ? 'bg-primary text-black hover:bg-primary/90 shadow-[0_0_15px_rgba(0,242,254,0.3)]'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      }`}
+                    >
+                      <Video className="h-4 w-4" />
+                      {active ? 'Entrar Agora' : 'Abrir Sala'}
+                      <ExternalLink className="h-3.5 w-3.5 opacity-70" />
+                    </a>
+                  </div>
                 </div>
               )
             })}

@@ -25,7 +25,7 @@ export default function LoginPage({
         </div>
 
         <div className="glass p-8 rounded-3xl w-full">
-          <form className="flex flex-col gap-5">
+          <form action={login} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-300" htmlFor="email">
                 E-mail
@@ -59,7 +59,7 @@ export default function LoginPage({
             )}
 
             <button
-              formAction={login}
+              type="submit"
               className="mt-4 w-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-gray-950 font-bold px-4 py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(0,242,254,0.2)] hover:shadow-[0_0_25px_rgba(0,242,254,0.4)] flex items-center justify-center gap-2 group"
             >
               Entrar <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />

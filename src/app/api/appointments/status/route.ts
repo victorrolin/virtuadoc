@@ -32,11 +32,10 @@ export async function POST(request: Request) {
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
-    const { error, count } = await adminClient
+    const { error } = await adminClient
       .from('appointments')
       .update({ status })
       .eq('id', appointmentId)
-      .select('id', { count: 'exact' })
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })

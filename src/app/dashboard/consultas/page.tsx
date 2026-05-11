@@ -29,6 +29,7 @@ export default async function ConsultasPage() {
       end_time,
       status,
       meeting_link,
+      reason,
       patient:profiles!appointments_patient_id_fkey(full_name, phone)
     `)
     .eq('doctor_id', user.id)
@@ -138,6 +139,14 @@ export default async function ConsultasPage() {
                       </div>
                       {patient?.phone && (
                         <p className="text-xs text-gray-500 mt-0.5">📱 {patient.phone}</p>
+                      )}
+                      {appt.reason && (
+                        <div className="mt-2 flex items-start gap-1.5 bg-white/5 rounded-lg px-3 py-2 border border-white/5">
+                          <FileText className="h-3.5 w-3.5 text-primary flex-shrink-0 mt-0.5" />
+                          <p className="text-xs text-gray-300 leading-relaxed">
+                            <span className="font-semibold text-primary">Motivo: </span>{appt.reason}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>

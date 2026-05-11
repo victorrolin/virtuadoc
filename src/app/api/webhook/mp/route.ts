@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
       status: 'paid',
       meeting_link: meta.meet_link,
       payment_id: String(paymentId),
+      reason: meta.reason || null,
     })
 
     // Buscar nome e email do médico

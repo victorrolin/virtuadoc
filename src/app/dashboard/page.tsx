@@ -40,6 +40,7 @@ export default async function DashboardPage() {
         start_time,
         status,
         meeting_link,
+        reason,
         patient:profiles!appointments_patient_id_fkey(full_name)
       `)
       .eq('doctor_id', user!.id)
@@ -151,6 +152,12 @@ export default async function DashboardPage() {
                     <div>
                       <p className="text-white text-sm font-medium">{patient?.full_name}</p>
                       <p className="text-xs text-gray-400">{formatDate(appt.appointment_date, appt.start_time)}</p>
+                      {appt.reason && (
+                        <p className="text-xs text-primary/80 mt-1 flex items-center gap-1">
+                          <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+                          {appt.reason.length > 60 ? appt.reason.slice(0, 60) + '...' : appt.reason}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <a

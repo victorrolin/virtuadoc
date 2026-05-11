@@ -21,8 +21,10 @@ export function AdminDoctorForm() {
 
       if (res?.error) {
         setErrorMsg(res.error)
+        setSuccess(false)
       } else {
         setSuccess(true)
+        setErrorMsg('')
         e.currentTarget.reset() // Limpar o formulário
         
         // Esconder mensagem de sucesso após 5 segundos

@@ -51,27 +51,60 @@ export async function createDoctor(formData: FormData) {
        price_per_consultation: price ? parseFloat(price) : null
      }, { onConflict: 'id' })
 
-     // 4. Inserir especialidades
-     if (specialtiesRaw) {
-       const specialtiesList = specialtiesRaw.split(',').map(s => s.trim()).filter(Boolean)
-       
-       for (const specName of specialtiesList) {
-         // Upsert: Cria a especialidade se não existir (baseado no nome único)
-         const { data: specData } = await adminClient
-           .from('specialties')
-           .upsert({ name: specName }, { onConflict: 'name' })
-           .select()
-           .single()
+      // 4. Inserir especialidades
+      if (specialtiesRaw) {
+        const specialtiesList = specialtiesRaw.split(',').map(s => s.trim()).filter(Boolean)
+        
+        for (const specName of specialtiesList) {
+          let specId = null;
+          // Tenta fazer upsert
+          const { data: specData } = await adminClient
+            .from('specialties')
+            .upsert({ name: specName }, { onConflict: 'name' })
+            .select('id')
+            .single()
 
-         if (specData) {
-           // Associa o médico à especialidade
-           await adminClient.from('doctor_specialties').insert({
-             doctor_id: authData.user.id,
-             specialty_id: specData.id
-           })
-         }
-       }
-     }
+          if (specData) {
+            specId = specData.id;
+          } else {
+            // Se o upsert não retornou (pode acontecer em conflitos que não atualizam nada), buscamos manualmente
+            const { data: existingSpec } = await adminClient.from('specialties').select('id').eq('name', specName).single()
+            if (existingSpec) specId = existingSpec.id;
+          }
+
+          if (specId) {
+            // Associa o médico à especialidade (com upsert pra evitar erro se clicou duas vezes)
+            await adminClient.from('doctor_specialties').upsert({
+              doctor_id: authData.user.id,
+              specialty_id: specId
+            }, { onConflict: 'doctor_id, specialty_id' })
+          }
+        }
+      }
+   }
+
+   revalidatePath('/dashboard/admin')
+   return { success: true }
+}
+
+export async function deleteDoctor(doctorId: string) {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (profile?.role !== 'admin') throw new Error('Not authorized')
+
+  const adminClient = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+
+  const { error } = await adminClient.auth.admin.deleteUser(doctorId)
+  
+  if (error) {
+    return { error: 'Falha ao excluir médico: ' + error.message }
   }
 
   revalidatePath('/dashboard/admin')

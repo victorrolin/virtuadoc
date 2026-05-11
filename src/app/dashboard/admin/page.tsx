@@ -1,4 +1,5 @@
 import { AdminDoctorForm } from '@/components/AdminDoctorForm'
+import { DeleteDoctorButton } from '@/components/DeleteDoctorButton'
 import { createClient } from '@/lib/supabase/server'
 import { ShieldCheck, Users } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -72,8 +73,8 @@ export default async function AdminPage() {
                       <div className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-md">
                         Ativo
                       </div>
-                      {/* Futuramente: Botões de Editar e Trocar Senha */}
                       <button className="text-xs text-gray-400 hover:text-white underline">Editar</button>
+                      <DeleteDoctorButton doctorId={doc.id} />
                     </div>
                   </div>
                 )

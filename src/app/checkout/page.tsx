@@ -43,16 +43,15 @@ function CheckoutContent() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ doctorId, date, time, ...form, price })
+        body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty })
       })
       const data = await res.json()
       
-      if (data.success) {
-        setAppointmentId(data.appointmentId)
-        setMeetLink(data.meetLink)
-        setStep('confirmed')
+      if (data.success && data.checkoutUrl) {
+        // Redirecionar para o checkout do Mercado Pago
+        window.location.href = data.checkoutUrl
       } else {
-        alert('Erro: ' + data.error)
+        alert('Erro ao iniciar pagamento: ' + (data.error || 'Tente novamente'))
       }
     } catch {
       alert('Erro de conexão. Tente novamente.')

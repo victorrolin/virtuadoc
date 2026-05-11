@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  lumina-health:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lumina-health-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    networks:
+      - proxy-tier
+
+networks:
+  proxy-tier:
+    name: proxy-tier
+    external: true

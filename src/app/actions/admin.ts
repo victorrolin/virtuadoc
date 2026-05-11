@@ -28,33 +28,46 @@ export async function createDoctor(formData: FormData) {
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
+    let userId: string
+
     const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: {
-        full_name: fullName,
-        role: 'doctor'
-      }
+      user_metadata: { full_name: fullName, role: 'doctor' }
     })
 
     if (authError) {
-      return { error: 'Falha Auth: ' + authError.message }
+      // Se o e-mail já existe, buscar o usuário existente e reutilizá-lo
+      if (authError.message.includes('already been registered') || authError.code === 'email_exists') {
+        const { data: existingUsers } = await adminClient.auth.admin.listUsers()
+        const existing = existingUsers.users.find(u => u.email === email)
+        if (!existing) return { error: 'E-mail já existe mas não foi possível localizar o usuário.' }
+        userId = existing.id
+        // Atualizar senha e metadados do usuário existente
+        await adminClient.auth.admin.updateUserById(userId, {
+          password,
+          user_metadata: { full_name: fullName, role: 'doctor' }
+        })
+      } else {
+        return { error: 'Falha Auth: ' + authError.message }
+      }
+    } else {
+      if (!authData?.user) return { error: 'Falha ao criar usuário.' }
+      userId = authData.user.id
     }
 
-    // 3. Update or Create the profile safely
-    if (authData?.user) {
-      const { error: upsertProfErr } = await adminClient.from('profiles').upsert({
-        id: authData.user.id,
-        full_name: fullName,
-        role: 'doctor',
-        crm: crm,
-        price_per_consultation: price ? parseFloat(price) : null,
-        specialties: specialtiesRaw // Gravando direto na nova coluna
-      }, { onConflict: 'id' })
+    // 3. Upsert do perfil
+    const { error: upsertProfErr } = await adminClient.from('profiles').upsert({
+      id: userId,
+      full_name: fullName,
+      role: 'doctor',
+      crm: crm,
+      price_per_consultation: price ? parseFloat(price) : null,
+      specialties: specialtiesRaw
+    }, { onConflict: 'id' })
 
-      if (upsertProfErr) return { error: 'Erro Profile: ' + upsertProfErr.message }
-    }
+    if (upsertProfErr) return { error: 'Erro Profile: ' + upsertProfErr.message }
 
     revalidatePath('/dashboard/admin')
     return { success: true }

@@ -1,42 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { MercadoPagoConfig, Preference } from 'mercadopago'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { doctorId, date, time, name, email, phone, cpf, reason, notes, price, doctorName, specialty } = body
+    const { doctorId, date, time, name, email, phone, cpf, reason, price, doctorName, specialty } = body
 
+    const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
 
-    // 1. Gerar ID único da sala Jitsi (antes do pagamento para incluir no e-mail)
+    if (!accessToken) {
+      return NextResponse.json({ success: false, error: 'Token MP não configurado' }, { status: 500 })
+    }
+
+    // Gerar link da sala Jitsi único
     const roomId = `virtuadoc-${doctorId.slice(0, 8)}-${Date.now()}`
     const meetLink = `https://meet.jit.si/${roomId}`
 
-    // 2. Criar Preferência no Mercado Pago
-    const mpClient = new MercadoPagoConfig({
-      accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
-    })
-
-    const preference = new Preference(mpClient)
-    const prefResult = await preference.create({
-      body: {
+    // Chamar API REST do Mercado Pago diretamente
+    const mpResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
         items: [
           {
             id: roomId,
             title: `Teleconsulta com ${doctorName || 'Médico'} – ${specialty || 'Consulta Online'}`,
             description: `Data: ${date} às ${time}. Motivo: ${reason || 'Não informado'}`,
             quantity: 1,
-            unit_price: parseFloat(price) || 150,
+            unit_price: parseFloat(price) || 1,
             currency_id: 'BRL',
           },
         ],
         payer: {
-          name: name.split(' ')[0],
-          surname: name.split(' ').slice(1).join(' ') || name,
+          name: name?.split(' ')[0] || name,
+          surname: name?.split(' ').slice(1).join(' ') || '',
           email: email,
-          phone: { area_code: phone?.replace(/\D/g, '').slice(0, 2) || '11', number: phone?.replace(/\D/g, '').slice(2) || '' },
-          identification: { type: 'CPF', number: cpf?.replace(/\D/g, '') || '' },
+          phone: {
+            area_code: phone?.replace(/\D/g, '').slice(0, 2) || '11',
+            number: phone?.replace(/\D/g, '').slice(2) || '',
+          },
+          identification: {
+            type: 'CPF',
+            number: cpf?.replace(/\D/g, '') || '',
+          },
         },
         back_urls: {
           success: `${appUrl}/pagamento/sucesso`,
@@ -45,7 +54,6 @@ export async function POST(req: NextRequest) {
         },
         auto_return: 'approved',
         notification_url: `${appUrl}/api/webhook/mp`,
-        // Metadados para o webhook processar
         metadata: {
           doctor_id: doctorId,
           patient_name: name,
@@ -57,15 +65,24 @@ export async function POST(req: NextRequest) {
           reason: reason || '',
         },
         statement_descriptor: 'VIRTUADOCTOR',
-        expires: false,
-      },
+      }),
     })
+
+    const mpData = await mpResponse.json()
+
+    if (!mpResponse.ok) {
+      console.error('MP API error:', JSON.stringify(mpData))
+      return NextResponse.json(
+        { success: false, error: mpData?.message || 'Erro ao criar preferência no MP' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
-      checkoutUrl: prefResult.init_point, // URL do checkout MP em produção
-      sandboxUrl: prefResult.sandbox_init_point, // URL do checkout MP em sandbox
-      preferenceId: prefResult.id,
+      checkoutUrl: mpData.init_point,        // Produção
+      sandboxUrl: mpData.sandbox_init_point,  // Sandbox
+      preferenceId: mpData.id,
     })
   } catch (err: any) {
     console.error('Checkout error:', err)

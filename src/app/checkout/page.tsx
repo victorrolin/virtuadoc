@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Activity, ArrowLeft, Calendar, Clock, User, Mail, Phone, CreditCard, CheckCircle2, Video, Loader2, FileText } from 'lucide-react'
 import Link from 'next/link'
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   
@@ -281,3 +281,16 @@ export default function CheckoutPage() {
     </div>
   )
 }
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-10 w-10 text-primary animate-spin" />
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
+  )
+}
+

@@ -30,7 +30,9 @@ export function AdminDoctorForm() {
         // Esconder mensagem de sucesso após 5 segundos
         setTimeout(() => setSuccess(false), 5000)
       }
-    } catch (err) {
+    } catch (err: any) {
+      // Next.js lança exceção interna ao revalidar — não é um erro real
+      if (err?.message?.includes('NEXT_') || err?.digest) return
       setErrorMsg('Ocorreu um erro ao cadastrar o médico.')
     } finally {
       setLoading(false)

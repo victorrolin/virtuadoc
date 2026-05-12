@@ -145,20 +145,68 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Lista de Atendimentos */}
-        <div className="lg:col-span-2 glass rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Video className="h-5 w-5 text-primary" /> Próximos Atendimentos
-            </h2>
-            {isDoctor && nextAppointments.length > 0 && (
-              <Link
-                href="/dashboard/consultas"
-                className="text-sm text-primary hover:underline flex items-center gap-1"
-              >
-                Ver todos <ArrowRight className="h-4 w-4" />
-              </Link>
-            )}
-          </div>
+        <div className="lg:col-span-2 space-y-6">
+          {/* Card de Próximo Paciente (Destaque) */}
+          {nextAppointments.length > 0 && (
+            <div className="bg-gradient-to-r from-primary/20 to-secondary/20 rounded-3xl p-1 shadow-xl animate-fade-in">
+              <div className="bg-[#0a0a0a] rounded-[1.4rem] p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4">
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-[10px] font-bold text-green-400 uppercase tracking-wider animate-pulse">
+                    <span className="h-2 w-2 rounded-full bg-green-500"></span> Agora
+                  </div>
+                </div>
+                
+                <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Video className="h-4 w-4" /> Próximo Atendimento
+                </h3>
+                
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="flex items-center gap-5">
+                    <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-black border border-primary/20">
+                      {nextAppointments[0].patient?.full_name?.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">{nextAppointments[0].patient?.full_name}</p>
+                      <p className="text-primary font-medium flex items-center gap-2 mt-1">
+                        <Clock className="h-4 w-4" /> {formatDate(nextAppointments[0].appointment_date, nextAppointments[0].start_time)}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <a
+                    href={nextAppointments[0].meeting_link || `https://meet.jit.si/virtuadoc-${nextAppointments[0].id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto bg-primary text-black font-black px-8 py-4 rounded-2xl flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-[0_0_30px_rgba(0,242,254,0.3)]"
+                  >
+                    Iniciar Teleconsulta <ArrowRight className="h-5 w-5" />
+                  </a>
+                </div>
+                
+                {nextAppointments[0].reason && (
+                  <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Motivo da Consulta</p>
+                    <p className="text-sm text-gray-300 italic">"{nextAppointments[0].reason}"</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="glass rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" /> Fila de Espera
+              </h2>
+              {isDoctor && nextAppointments.length > 0 && (
+                <Link
+                  href="/dashboard/consultas"
+                  className="text-sm text-primary hover:underline flex items-center gap-1"
+                >
+                  Ver todos <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
           
           {nextAppointments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

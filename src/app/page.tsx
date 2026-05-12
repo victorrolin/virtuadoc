@@ -112,22 +112,22 @@ export default async function Home() {
               </div>
 
               {/* Coluna da Imagem (Hero Image) */}
-              <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+              <div className="relative mx-auto w-full max-w-lg lg:max-w-none lg:block">
                 {/* Elemento Decorativo de Fundo */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary to-cyan-400 rounded-[3rem] rotate-3 opacity-20 blur-lg animate-pulse"></div>
                 
                 {/* Container da Imagem Principal */}
-                <div className="relative rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] sm:aspect-square lg:aspect-[4/5]">
+                <div className="relative rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl min-h-[450px] lg:min-h-[600px] h-full">
                   <img 
                     src="https://images.unsplash.com/photo-1576091160550-2173ff9e5ee4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
                     alt="Médica em Teleconsulta"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                 </div>
 
                 {/* Card Flutuante 1 - Notificação de Consulta */}
-                <div className="absolute top-12 -left-6 sm:-left-12 glass p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-4 animate-float">
+                <div className="absolute top-12 -left-6 lg:-left-12 glass p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-4 animate-float z-20">
                   <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center border border-primary/30 relative">
                     <Video className="h-5 w-5 text-primary" />
                     <div className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full border-2 border-[#0a0a0a]"></div>
@@ -139,16 +139,16 @@ export default async function Home() {
                 </div>
 
                 {/* Card Flutuante 2 - Especialistas */}
-                <div className="absolute bottom-12 -right-6 sm:-right-8 glass p-4 rounded-2xl border border-white/10 shadow-2xl animate-float" style={{ animationDelay: '1.5s' }}>
+                <div className="absolute bottom-12 -right-6 lg:-right-8 glass p-4 rounded-2xl border border-white/10 shadow-2xl animate-float z-20" style={{ animationDelay: '1.5s' }}>
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-3">
-                      <div className="h-10 w-10 rounded-full bg-gray-600 border-2 border-[#0a0a0a] overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" alt="Médico" className="object-cover h-full w-full absolute inset-0" />
+                      <div className="h-10 w-10 rounded-full bg-gray-600 border-2 border-[#0a0a0a] overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" alt="Médico" className="object-cover h-full w-full" />
                       </div>
-                      <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1594824436998-efa5c39fe385?auto=format&fit=crop&w=100&q=80" alt="Médica" className="object-cover h-full w-full absolute inset-0" />
+                      <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1594824436998-efa5c39fe385?auto=format&fit=crop&w=100&q=80" alt="Médica" className="object-cover h-full w-full" />
                       </div>
-                      <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center relative z-10">
+                      <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center">
                         <span className="text-xs font-bold text-black">+50</span>
                       </div>
                     </div>

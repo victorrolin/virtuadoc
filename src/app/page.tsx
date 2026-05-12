@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { Activity, ArrowRight, Video, Calendar, Shield, CheckCircle2, Star, Clock, Users, ChevronDown, Phone, Zap } from 'lucide-react'
 
@@ -7,7 +8,7 @@ export default async function Home() {
   
   const { data: doctors } = await supabase
     .from('profiles')
-    .select('id, full_name, specialties, price_per_consultation, bio, crm')
+    .select('id, full_name, specialties, price_per_consultation, bio, crm, avatar_url')
     .eq('role', 'doctor')
     .limit(6)
 
@@ -164,8 +165,12 @@ export default async function Home() {
                 {doctors.map(doc => (
                   <div key={doc.id} className="glass rounded-3xl p-6 hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] hover:scale-[1.02] transition-all group border border-white/5">
                     <div className="flex items-start gap-4 mb-5">
-                      <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-primary to-cyan-400 flex items-center justify-center text-black font-bold text-2xl shadow-lg flex-shrink-0">
-                        {doc.full_name?.charAt(0).toUpperCase()}
+                      <div className="h-16 w-16 rounded-2xl overflow-hidden bg-gradient-to-tr from-primary to-cyan-400 flex items-center justify-center text-black font-bold text-2xl shadow-lg flex-shrink-0">
+                        {doc.avatar_url ? (
+                          <Image src={doc.avatar_url} alt={doc.full_name} width={64} height={64} className="object-cover w-full h-full" unoptimized />
+                        ) : (
+                          doc.full_name?.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <div>
                         <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors">{doc.full_name}</h3>

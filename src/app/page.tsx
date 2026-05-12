@@ -106,20 +106,6 @@ export default async function Home() {
               </a>
             </div>
 
-            {/* Social proof bar */}
-            <div className="flex flex-wrap justify-center gap-8 text-center">
-              {[
-                { num: '500+', label: 'Consultas Realizadas' },
-                { num: '50+', label: 'Especialistas' },
-                { num: '4.9★', label: 'Avaliação Média' },
-                { num: '24h', label: 'Suporte Disponível' },
-              ].map(stat => (
-                <div key={stat.label}>
-                  <div className="text-2xl font-extrabold text-white">{stat.num}</div>
-                  <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 

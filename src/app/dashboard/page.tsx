@@ -269,6 +269,7 @@ export default async function DashboardPage() {
             </div>
           )}
         </div>
+      </div>
 
         {/* Coluna Direita - Atalhos do Dr. Virtua */}
         {isDoctor && (

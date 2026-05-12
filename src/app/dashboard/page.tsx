@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { Calendar, Users, Video, Clock, ArrowRight, Activity } from 'lucide-react'
+import { Calendar, Users, Video, Clock, ArrowRight, Activity, Edit3, Zap } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function DashboardPage() {
@@ -236,6 +236,28 @@ export default async function DashboardPage() {
               <Link href="/dashboard/assistente" className="w-full bg-primary text-black font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-lg shadow-primary/20">
                 Acessar Consultoria IA
               </Link>
+            </div>
+
+            <div className="glass rounded-2xl p-6 border border-white/5">
+              <h2 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <Edit3 className="h-4 w-4 text-primary" /> Bloco de Notas Rápidas
+              </h2>
+              <textarea 
+                placeholder="Ex: Lembrar de revisar o exame do Sr. João..."
+                className="w-full h-32 bg-black/40 border border-white/10 rounded-xl p-3 text-xs text-gray-300 focus:outline-none focus:border-primary/50 transition-colors resize-none mb-3 custom-scrollbar"
+              ></textarea>
+              <button className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-bold text-gray-400 transition-all">
+                Salvar Nota Localmente
+              </button>
+            </div>
+
+            <div className="glass rounded-2xl p-6 border border-white/5 bg-gradient-to-br from-secondary/5 to-transparent">
+              <h2 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <Zap className="h-4 w-4 text-yellow-400" /> Insight do Dr. Virtua
+              </h2>
+              <div className="p-3 bg-black/20 rounded-xl border border-white/5 italic text-[11px] text-gray-400 leading-relaxed">
+                "Dica: Pacientes com sintomas persistentes de fadiga podem se beneficiar de uma revisão nos níveis de Vitamina D e Ferritina antes da próxima consulta."
+              </div>
             </div>
 
             <div className="glass rounded-2xl p-6 border border-white/5">

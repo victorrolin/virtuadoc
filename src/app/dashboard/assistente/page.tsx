@@ -124,33 +124,33 @@ export default function AssistentePage() {
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-6rem)]">
-      {/* Header tipo WhatsApp */}
-      <div className="flex-shrink-0 bg-[#070707] border-b border-white/5 p-4 flex items-center gap-4 rounded-t-2xl z-10">
-        <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center border border-primary/30 relative">
-          <Stethoscope className="h-6 w-6 text-primary" />
-          <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-[#070707] rounded-full"></div>
+      {/* Header Premium */}
+      <div className="flex-shrink-0 glass border-b border-white/5 p-4 flex items-center gap-4 rounded-t-3xl z-20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div className="h-12 w-12 bg-gradient-to-tr from-primary to-cyan-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(0,242,254,0.4)] relative">
+          <Stethoscope className="h-6 w-6 text-black" />
+          <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-green-500 border-2 border-[#070707] rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
         </div>
         <div>
-          <h1 className="text-lg font-bold text-white">Dr. Virtua</h1>
-          <p className="text-xs text-primary">online</p>
+          <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Dr. Virtua <span className="text-primary text-[10px] font-bold uppercase tracking-wider ml-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">CDSS</span></h1>
+          <p className="text-xs text-green-400 font-medium flex items-center gap-1.5 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online e Pronto
+          </p>
         </div>
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-[#EFEAE2] relative custom-scrollbar border-x border-white/5">
-        {/* Fundo de Doodles do WhatsApp */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-40 z-0" 
-          style={{ 
-            backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', 
-            backgroundRepeat: 'repeat' 
-          }} 
-        />
+      {/* Chat Area Premium */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#050505] relative custom-scrollbar border-x border-white/5">
+        
+        {/* Glow de fundo */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
         
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center p-8 z-10 relative">
-            <div className="bg-yellow-100/90 p-4 rounded-xl text-xs text-gray-700 max-w-sm shadow-sm">
-              🔒 As mensagens são protegidas. Envie os sintomas, dados vitais e hipóteses do paciente abaixo para discutirmos o caso.
+            <div className="glass p-6 rounded-2xl text-sm text-gray-300 max-w-md border border-white/10 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-cyan-500"></div>
+              <Activity className="h-10 w-10 text-primary mx-auto mb-4 opacity-80" />
+              <p className="font-semibold text-white mb-2">Ambiente Clínico Seguro</p>
+              Envie os sintomas, dados vitais e hipóteses do paciente abaixo para discutirmos o caso com suporte baseado em evidências.
             </div>
           </div>
         )}
@@ -158,10 +158,10 @@ export default function AssistentePage() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex z-10 relative ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             
-            <div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 shadow-sm ${
+            <div className={`max-w-[85%] sm:max-w-[75%] rounded-3xl p-5 shadow-2xl ${
               msg.role === 'user' 
-                ? 'bg-[#d9fdd3] text-[#111b21] rounded-tr-sm' 
-                : 'bg-white border border-gray-200 rounded-tl-sm text-[#111b21]'
+                ? 'bg-gradient-to-br from-primary to-cyan-500 text-black rounded-tr-sm shadow-[0_0_20px_rgba(0,242,254,0.15)] font-medium' 
+                : 'glass border border-white/10 rounded-tl-sm text-gray-200'
             }`}>
               
               {/* User Message */}
@@ -194,22 +194,22 @@ export default function AssistentePage() {
                   {msg.structured && !msg.structured.mensagem && (
                     <div className="space-y-4">
                       {msg.structured.status_prioridade && (
-                        <div className="flex justify-between items-start gap-4 border-b border-gray-200 pb-3">
-                          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1">
-                            <Activity className="h-4 w-4" /> Avaliação
+                        <div className="flex justify-between items-start gap-4 border-b border-white/10 pb-3">
+                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <Activity className="h-4 w-4 text-primary" /> Avaliação
                           </span>
-                          <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border ${getPriorityColor(msg.structured.status_prioridade)}`}>
+                          <span className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full border shadow-sm ${getPriorityColor(msg.structured.status_prioridade)}`}>
                             {msg.structured.status_prioridade}
                           </span>
                         </div>
                       )}
 
                       {msg.structured.alertas_seguranca && msg.structured.alertas_seguranca.length > 0 && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
-                          <h3 className="text-red-600 font-bold flex items-center gap-1.5 mb-1.5 text-xs">
-                            <AlertTriangle className="h-3.5 w-3.5" /> Red Flags
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                          <h3 className="text-red-400 font-bold flex items-center gap-2 mb-2 text-xs uppercase tracking-wider">
+                            <AlertTriangle className="h-4 w-4" /> Red Flags Detectadas
                           </h3>
-                          <ul className="list-disc list-inside text-xs text-red-700 space-y-1">
+                          <ul className="list-disc list-inside text-sm text-red-200/90 space-y-1.5">
                             {msg.structured.alertas_seguranca.map((alerta, i) => (
                               <li key={i}>{alerta}</li>
                             ))}
@@ -219,12 +219,12 @@ export default function AssistentePage() {
 
                       {msg.structured.hipoteses_diagnosticas && msg.structured.hipoteses_diagnosticas.length > 0 && (
                         <div>
-                          <h3 className="text-gray-800 font-bold mb-2 flex items-center gap-1.5 text-xs">
-                            <CheckCircle className="h-3.5 w-3.5 text-green-600" /> Hipóteses
+                          <h3 className="text-gray-300 font-bold mb-2.5 flex items-center gap-2 text-xs uppercase tracking-wider">
+                            <CheckCircle className="h-4 w-4 text-primary" /> Hipóteses
                           </h3>
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-2">
                             {msg.structured.hipoteses_diagnosticas.map((hd, i) => (
-                              <span key={i} className="px-2 py-1 bg-gray-100 border border-gray-200 rounded-lg text-xs text-gray-800">
+                              <span key={i} className="px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-gray-300 shadow-sm">
                                 {hd}
                               </span>
                             ))}
@@ -234,30 +234,31 @@ export default function AssistentePage() {
 
                       {msg.structured.analise_tecnica && (
                         <div>
-                          <h3 className="text-teal-700 font-bold mb-1 text-xs">Análise Clínica</h3>
-                          <p className="text-gray-700 text-xs leading-relaxed">{msg.structured.analise_tecnica}</p>
+                          <h3 className="text-primary font-bold mb-1.5 text-xs uppercase tracking-wider">Análise Clínica</h3>
+                          <p className="text-gray-300 text-sm leading-relaxed">{msg.structured.analise_tecnica}</p>
                         </div>
                       )}
 
                       {msg.structured.conduta_sugerida && (
-                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
-                          <h3 className="text-gray-800 font-bold mb-1 text-xs">Conduta</h3>
-                          <p className="text-gray-700 text-xs leading-relaxed whitespace-pre-wrap">{msg.structured.conduta_sugerida}</p>
+                        <div className="bg-white/5 p-4 rounded-2xl border border-white/5 relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+                          <h3 className="text-white font-bold mb-2 text-xs uppercase tracking-wider">Conduta Sugerida</h3>
+                          <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{msg.structured.conduta_sugerida}</p>
                         </div>
                       )}
 
                       {msg.structured.evidencia_base_conhecimento && msg.structured.evidencia_base_conhecimento.fonte && (
-                        <div className="border-t border-gray-200 pt-3 mt-3 text-[10px]">
-                          <h3 className="font-semibold text-gray-500 uppercase flex items-center gap-1 mb-1">
-                            <BookOpen className="h-3 w-3" /> Evidência
+                        <div className="border-t border-white/10 pt-4 mt-4 text-xs">
+                          <h3 className="font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                            <BookOpen className="h-3.5 w-3.5 text-gray-500" /> Evidência Base
                           </h3>
-                          <div className="text-gray-600">
-                            <strong>Fonte:</strong> {msg.structured.evidencia_base_conhecimento.fonte} <br/>
-                            <strong>Ref:</strong> {msg.structured.evidencia_base_conhecimento.referencia_resumida}
+                          <div className="text-gray-400 space-y-1 bg-black/20 p-3 rounded-xl border border-white/5">
+                            <p><strong>Fonte:</strong> <span className="text-gray-300">{msg.structured.evidencia_base_conhecimento.fonte}</span></p>
+                            <p><strong>Ref:</strong> <span className="text-gray-300">{msg.structured.evidencia_base_conhecimento.referencia_resumida}</span></p>
                             {msg.structured.evidencia_base_conhecimento.link_ou_doi && (
-                              <div className="mt-1">
-                                <a href={msg.structured.evidencia_base_conhecimento.link_ou_doi.startsWith('http') ? msg.structured.evidencia_base_conhecimento.link_ou_doi : `https://doi.org/${msg.structured.evidencia_base_conhecimento.link_ou_doi}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">
-                                  Ver fonte ↗
+                              <div className="mt-2">
+                                <a href={msg.structured.evidencia_base_conhecimento.link_ou_doi.startsWith('http') ? msg.structured.evidencia_base_conhecimento.link_ou_doi : `https://doi.org/${msg.structured.evidencia_base_conhecimento.link_ou_doi}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:text-cyan-400 font-medium transition-colors">
+                                  Acessar Referência ↗
                                 </a>
                               </div>
                             )}
@@ -274,21 +275,21 @@ export default function AssistentePage() {
         
         {loading && (
           <div className="flex justify-start z-10 relative">
-            <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm p-4 shadow-sm flex items-center gap-2 text-gray-500 text-sm font-medium">
-              <span className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+            <div className="glass border border-white/10 rounded-3xl rounded-tl-sm p-5 shadow-lg flex items-center gap-3 text-primary text-sm font-medium">
+              <span className="flex gap-1.5">
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce shadow-[0_0_8px_rgba(0,242,254,0.8)]" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce shadow-[0_0_8px_rgba(0,242,254,0.8)]" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce shadow-[0_0_8px_rgba(0,242,254,0.8)]" style={{ animationDelay: '300ms' }}></span>
               </span>
-              digitando...
+              Processando raciocínio clínico...
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="flex-shrink-0 bg-[#070707] border-t border-x border-white/5 p-4 rounded-b-2xl">
+      {/* Input Area Premium */}
+      <div className="flex-shrink-0 glass border-t border-x border-white/5 p-4 sm:p-5 rounded-b-3xl z-20">
         {filePreview && (
           <div className="mb-3 relative inline-block">
             {filePreview.startsWith('data:image') ? (
@@ -326,8 +327,8 @@ export default function AssistentePage() {
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Mensagem..."
-            className="flex-1 bg-[#1a1a1a] border border-white/10 rounded-2xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 text-sm resize-none min-h-[48px] max-h-[120px] custom-scrollbar"
+            placeholder="Descreva o quadro clínico, exames e dúvidas..."
+            className="flex-1 bg-black/40 border border-white/10 rounded-2xl py-3 px-5 text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:bg-black/60 focus:ring-1 focus:ring-primary/30 text-sm resize-none min-h-[52px] max-h-[150px] custom-scrollbar transition-all"
             rows={1}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -339,7 +340,7 @@ export default function AssistentePage() {
           <button
             type="submit"
             disabled={loading || (!prompt.trim() && !file)}
-            className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-primary text-black rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:bg-white/10 disabled:text-gray-500 transition-all shadow-md"
+            className="h-[52px] w-[52px] flex-shrink-0 flex items-center justify-center bg-gradient-to-tr from-primary to-cyan-500 text-black rounded-full hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:from-gray-700 disabled:to-gray-800 disabled:text-gray-400 transition-all shadow-[0_0_20px_rgba(0,242,254,0.3)]"
           >
             <Send className="h-5 w-5 ml-1" />
           </button>

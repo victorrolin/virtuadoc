@@ -141,12 +141,9 @@ export default function AssistentePage() {
       {/* Chat Area Premium */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0b141a] relative custom-scrollbar border-x border-white/5">
         
-        {/* Glow de fundo */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
-        
         {/* Fundo de Doodles do WhatsApp Escuro */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-[0.03] z-0" 
+          className="absolute inset-0 pointer-events-none opacity-[0.08] z-0" 
           style={{ 
             backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', 
             backgroundRepeat: 'repeat',

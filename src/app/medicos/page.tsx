@@ -65,6 +65,10 @@ export default async function MedicosPage() {
                   </div>
                 </div>
 
+                <p className="text-sm text-gray-400 mb-5 line-clamp-2">
+                  {doctor.bio || 'Especialista comprometido em oferecer atendimento humanizado e de alta qualidade por telemedicina.'}
+                </p>
+
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-2 text-sm text-gray-300">
                     <Video className="h-4 w-4 text-secondary" /> Telemedicina

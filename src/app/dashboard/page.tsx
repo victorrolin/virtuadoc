@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { Calendar, Users, Video, Clock, ArrowRight } from 'lucide-react'
+import { Calendar, Users, Video, Clock, ArrowRight, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function DashboardPage() {

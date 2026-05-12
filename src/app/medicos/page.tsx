@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Activity, Star, MapPin, Video, ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 
 export default async function MedicosPage() {
   const supabase = await createClient()
@@ -45,8 +46,12 @@ export default async function MedicosPage() {
             {doctors?.map((doctor) => (
               <div key={doctor.id} className="glass rounded-3xl p-6 transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] group">
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                    {doctor.full_name?.charAt(0)}
+                  <div className="h-16 w-16 rounded-2xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
+                    {doctor.avatar_url ? (
+                      <Image src={doctor.avatar_url} alt={doctor.full_name} width={64} height={64} className="object-cover w-full h-full" unoptimized />
+                    ) : (
+                      doctor.full_name?.charAt(0)
+                    )}
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors">

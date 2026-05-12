@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut } from 'lucide-react'
+import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircle } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import { BackButton } from '@/components/BackButton'
 
@@ -60,6 +60,10 @@ export default async function DashboardLayout({
                 <Link href="/dashboard/consultas" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
                   <Video className="h-5 w-5" />
                   Salas de Vídeo
+                </Link>
+                <Link href="/dashboard/perfil" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
+                  <UserCircle className="h-5 w-5" />
+                  Meu Perfil
                 </Link>
               </>
             )}

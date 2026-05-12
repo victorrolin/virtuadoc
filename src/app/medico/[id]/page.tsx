@@ -3,6 +3,7 @@ import { getDoctorAvailableSlots } from '@/app/actions/appointments'
 import { Activity, MapPin, Star, Video, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 
 export default async function DoctorProfilePage({
   params,
@@ -43,8 +44,12 @@ export default async function DoctorProfilePage({
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Doctor Header Info */}
         <div className="glass rounded-3xl p-8 mb-8 flex flex-col md:flex-row gap-8 items-start">
-          <div className="h-32 w-32 rounded-3xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-5xl shadow-[0_0_40px_rgba(0,242,254,0.3)] shrink-0">
-            {doctor.full_name?.charAt(0)}
+          <div className="h-32 w-32 rounded-3xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-5xl shadow-[0_0_40px_rgba(0,242,254,0.3)] shrink-0">
+            {doctor.avatar_url ? (
+              <Image src={doctor.avatar_url} alt={doctor.full_name} width={128} height={128} className="object-cover w-full h-full" unoptimized />
+            ) : (
+              doctor.full_name?.charAt(0)
+            )}
           </div>
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">

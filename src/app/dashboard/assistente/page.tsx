@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, AlertTriangle, CheckCircle, Activity, BookOpen, Stethoscope } from 'lucide-react'
+import { Send, AlertTriangle, CheckCircle, Activity, BookOpen, Stethoscope, Paperclip, X, FileText } from 'lucide-react'
 
 interface AssitantResponse {
   status_prioridade?: string
@@ -22,6 +22,8 @@ interface Message {
   role: 'user' | 'assistant'
   content?: string
   structured?: AssitantResponse
+  imageUrl?: string
+  fileName?: string
 }
 
 export default function AssistentePage() {
@@ -29,6 +31,9 @@ export default function AssistentePage() {
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [error, setError] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+  const [filePreview, setFilePreview] = useState<string>('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -37,18 +42,38 @@ export default function AssistentePage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0]
+    if (!selected) return
+
+    setFile(selected)
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setFilePreview(event.target?.result as string)
+    }
+    reader.readAsDataURL(selected)
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!prompt.trim()) return
+    if (!prompt.trim() && !file) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: prompt.trim()
+      content: prompt.trim(),
+      imageUrl: filePreview.startsWith('data:image') ? filePreview : undefined,
+      fileName: file ? file.name : undefined
     }
 
     setMessages(prev => [...prev, userMessage])
+    
+    const currentPrompt = prompt
+    const currentFilePreview = filePreview
+    
     setPrompt('')
+    setFile(null)
+    setFilePreview('')
     setLoading(true)
     setError('')
 
@@ -56,7 +81,10 @@ export default function AssistentePage() {
       const res = await fetch('/api/assistente', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage.content }),
+        body: JSON.stringify({ 
+          message: currentPrompt,
+          image: currentFilePreview || undefined 
+        }),
       })
 
       const data = await res.json()
@@ -138,7 +166,18 @@ export default function AssistentePage() {
               
               {/* User Message */}
               {msg.role === 'user' && (
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                <div className="flex flex-col gap-2">
+                  {msg.imageUrl && (
+                    <img src={msg.imageUrl} alt="Anexo" className="max-w-full sm:max-w-[250px] rounded-lg border border-black/10" />
+                  )}
+                  {!msg.imageUrl && msg.fileName && (
+                    <div className="flex items-center gap-2 bg-black/5 p-2 rounded-lg border border-black/10">
+                      <FileText className="h-4 w-4 text-gray-600" />
+                      <span className="text-xs text-gray-700 truncate max-w-[150px]">{msg.fileName}</span>
+                    </div>
+                  )}
+                  {msg.content && <p className="text-sm whitespace-pre-wrap">{msg.content}</p>}
+                </div>
               )}
 
               {/* Assistant Message */}
@@ -250,7 +289,40 @@ export default function AssistentePage() {
 
       {/* Input Area */}
       <div className="flex-shrink-0 bg-[#070707] border-t border-x border-white/5 p-4 rounded-b-2xl">
+        {filePreview && (
+          <div className="mb-3 relative inline-block">
+            {filePreview.startsWith('data:image') ? (
+              <img src={filePreview} alt="Preview" className="h-16 rounded-lg border border-white/20 object-cover" />
+            ) : (
+              <div className="flex items-center gap-2 bg-white/10 p-3 rounded-lg border border-white/20">
+                <FileText className="h-5 w-5 text-gray-300" />
+                <span className="text-xs text-gray-300 max-w-[120px] truncate">{file?.name}</span>
+              </div>
+            )}
+            <button 
+              type="button" 
+              onClick={() => {setFile(null); setFilePreview('')}} 
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="flex items-end gap-2">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileSelect}
+            className="hidden" 
+            accept="image/*,application/pdf" 
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="h-12 w-12 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-white transition-all bg-[#1a1a1a] border border-white/10 rounded-full hover:bg-white/5"
+          >
+            <Paperclip className="h-5 w-5" />
+          </button>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -266,7 +338,7 @@ export default function AssistentePage() {
           />
           <button
             type="submit"
-            disabled={loading || !prompt.trim()}
+            disabled={loading || (!prompt.trim() && !file)}
             className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-primary text-black rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:bg-white/10 disabled:text-gray-500 transition-all shadow-md"
           >
             <Send className="h-5 w-5 ml-1" />

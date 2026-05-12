@@ -81,29 +81,87 @@ export default async function Home() {
             <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]" />
           </div>
           
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-8 animate-fade-in">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider">Telemedicina Premium · 100% Online</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white tracking-tight mb-6 leading-[1.05]">
-              Saúde de qualidade<br />
-              <span className="text-gradient">sem sair de casa</span>
-            </h1>
-            
-            <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-400 mb-10 leading-relaxed">
-              Consulte os melhores especialistas do Brasil por videochamada. 
-              Agende em minutos, pague com segurança e receba atendimento no conforto da sua casa.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-              <Link href="/medicos" className="w-full sm:w-auto bg-white text-gray-950 font-bold px-8 py-4 rounded-full text-lg transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2">
-                Encontrar Meu Médico <ArrowRight className="h-5 w-5" />
-              </Link>
-              <a href="#como-funciona" className="w-full sm:w-auto border border-white/10 text-white font-semibold px-8 py-4 rounded-full text-lg transition-all hover:bg-white/5 flex items-center justify-center gap-2">
-                Como Funciona
-              </a>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+              
+              {/* Coluna de Texto */}
+              <div className="text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-8 animate-fade-in">
+                  <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-xs font-semibold text-primary uppercase tracking-wider">Telemedicina Premium · 100% Online</span>
+                </div>
+                
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight mb-6 leading-[1.1]">
+                  Saúde de qualidade<br />
+                  <span className="text-gradient">sem sair de casa</span>
+                </h1>
+                
+                <p className="max-w-2xl mx-auto lg:mx-0 text-lg md:text-xl text-gray-400 mb-10 leading-relaxed">
+                  Consulte os melhores especialistas do Brasil por videochamada. 
+                  Agende em minutos, pague com segurança e receba atendimento no conforto da sua casa.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-10 lg:mb-0">
+                  <Link href="/medicos" className="w-full sm:w-auto bg-white text-gray-950 font-bold px-8 py-4 rounded-full text-lg transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] flex items-center justify-center gap-2">
+                    Encontrar Meu Médico <ArrowRight className="h-5 w-5" />
+                  </Link>
+                  <a href="#como-funciona" className="w-full sm:w-auto border border-white/10 text-white font-semibold px-8 py-4 rounded-full text-lg transition-all hover:bg-white/5 flex items-center justify-center gap-2">
+                    Como Funciona
+                  </a>
+                </div>
+              </div>
+
+              {/* Coluna da Imagem (Hero Image) */}
+              <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+                {/* Elemento Decorativo de Fundo */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary to-cyan-400 rounded-[3rem] rotate-3 opacity-20 blur-lg animate-pulse"></div>
+                
+                {/* Container da Imagem Principal */}
+                <div className="relative rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] sm:aspect-square lg:aspect-[4/5]">
+                  <Image 
+                    src="https://images.unsplash.com/photo-1576091160550-2173ff9e5ee4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                    alt="Médica em Teleconsulta"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                </div>
+
+                {/* Card Flutuante 1 - Notificação de Consulta */}
+                <div className="absolute top-12 -left-6 sm:-left-12 glass p-4 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-4 animate-float">
+                  <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center border border-primary/30 relative">
+                    <Video className="h-5 w-5 text-primary" />
+                    <div className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full border-2 border-[#0a0a0a]"></div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">Consulta Iniciada</p>
+                    <p className="text-xs text-gray-400">Dra. Juliana Oliveira</p>
+                  </div>
+                </div>
+
+                {/* Card Flutuante 2 - Especialistas */}
+                <div className="absolute bottom-12 -right-6 sm:-right-8 glass p-4 rounded-2xl border border-white/10 shadow-2xl animate-float" style={{ animationDelay: '1.5s' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-3">
+                      <div className="h-10 w-10 rounded-full bg-gray-600 border-2 border-[#0a0a0a] overflow-hidden">
+                        <Image src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" width={40} height={40} alt="Médico" className="object-cover h-full w-full" unoptimized />
+                      </div>
+                      <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden">
+                        <Image src="https://images.unsplash.com/photo-1594824436998-efa5c39fe385?auto=format&fit=crop&w=100&q=80" width={40} height={40} alt="Médica" className="object-cover h-full w-full" unoptimized />
+                      </div>
+                      <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center">
+                        <span className="text-xs font-bold text-black">+50</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-white">Especialistas</p>
+                      <p className="text-xs text-primary font-medium">Disponíveis Agora</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
 
           </div>

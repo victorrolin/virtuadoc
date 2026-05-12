@@ -44,7 +44,7 @@ export default async function MedicosPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {doctors?.map((doctor) => (
-              <div key={doctor.id} className="glass rounded-3xl p-6 transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] group">
+              <Link href={`/medico/${doctor.id}`} key={doctor.id} className="block glass rounded-3xl p-6 transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] group">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="h-16 w-16 rounded-2xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
                     {doctor.avatar_url ? (
@@ -85,14 +85,13 @@ export default async function MedicosPage() {
                       {doctor.price_per_consultation ? `R$ ${doctor.price_per_consultation}` : 'A combinar'}
                     </span>
                   </div>
-                  <Link 
-                    href={`/medico/${doctor.id}`}
+                  <div 
                     className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2 rounded-xl transition-all flex items-center gap-2 text-sm"
                   >
                     Ver Agenda <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

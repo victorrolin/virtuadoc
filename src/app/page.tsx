@@ -163,7 +163,7 @@ export default async function Home() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {doctors.map(doc => (
-                  <div key={doc.id} className="glass rounded-3xl p-6 hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] hover:scale-[1.02] transition-all group border border-white/5">
+                  <Link href={`/medico/${doc.id}`} key={doc.id} className="block glass rounded-3xl p-6 hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] hover:scale-[1.02] transition-all group border border-white/5">
                     <div className="flex items-start gap-4 mb-5">
                       <div className="h-16 w-16 rounded-2xl overflow-hidden bg-gradient-to-tr from-primary to-cyan-400 flex items-center justify-center text-black font-bold text-2xl shadow-lg flex-shrink-0">
                         {doc.avatar_url ? (
@@ -187,12 +187,12 @@ export default async function Home() {
                         <p className="text-xs text-gray-500">Consulta a partir de</p>
                         <p className="text-xl font-bold text-white">R$ {doc.price_per_consultation || '—'}</p>
                       </div>
-                      <Link href={`/medico/${doc.id}`}
+                      <div 
                         className="bg-primary text-black font-bold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-all text-sm flex items-center gap-1.5">
                         Agendar <ArrowRight className="h-4 w-4" />
-                      </Link>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
               <div className="text-center mt-10">

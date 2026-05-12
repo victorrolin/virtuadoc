@@ -109,23 +109,31 @@ export default function AssistentePage() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-[#0a0a0a] custom-scrollbar border-x border-white/5 bg-[url('/bg-chat.png')] bg-repeat">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-[#EFEAE2] relative custom-scrollbar border-x border-white/5">
+        {/* Fundo de Doodles do WhatsApp */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-40 z-0" 
+          style={{ 
+            backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', 
+            backgroundRepeat: 'repeat' 
+          }} 
+        />
         
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8 opacity-50">
-            <div className="bg-black/50 p-4 rounded-2xl text-sm text-gray-400 max-w-sm border border-white/5">
-              Envie os sintomas, dados vitais e hipóteses do paciente abaixo para discutirmos o caso e condutas.
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 z-10 relative">
+            <div className="bg-yellow-100/90 p-4 rounded-xl text-xs text-gray-700 max-w-sm shadow-sm">
+              🔒 As mensagens são protegidas. Envie os sintomas, dados vitais e hipóteses do paciente abaixo para discutirmos o caso.
             </div>
           </div>
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={msg.id} className={`flex z-10 relative ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             
             <div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 shadow-sm ${
               msg.role === 'user' 
-                ? 'bg-primary text-black rounded-tr-sm' 
-                : 'bg-[#1a1a1a] border border-white/10 rounded-tl-sm text-gray-200'
+                ? 'bg-[#d9fdd3] text-[#111b21] rounded-tr-sm' 
+                : 'bg-white border border-gray-200 rounded-tl-sm text-[#111b21]'
             }`}>
               
               {/* User Message */}
@@ -137,18 +145,18 @@ export default function AssistentePage() {
               {msg.role === 'assistant' && (
                 <div className="space-y-4">
                   {msg.content && (
-                    <p className="text-sm whitespace-pre-wrap text-gray-300">{msg.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   )}
                   
                   {msg.structured?.mensagem && (
-                    <p className="text-sm whitespace-pre-wrap text-gray-300">{msg.structured.mensagem}</p>
+                    <p className="text-sm whitespace-pre-wrap">{msg.structured.mensagem}</p>
                   )}
 
                   {msg.structured && !msg.structured.mensagem && (
                     <div className="space-y-4">
                       {msg.structured.status_prioridade && (
-                        <div className="flex justify-between items-start gap-4 border-b border-white/5 pb-3">
-                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                        <div className="flex justify-between items-start gap-4 border-b border-gray-200 pb-3">
+                          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1">
                             <Activity className="h-4 w-4" /> Avaliação
                           </span>
                           <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border ${getPriorityColor(msg.structured.status_prioridade)}`}>
@@ -158,11 +166,11 @@ export default function AssistentePage() {
                       )}
 
                       {msg.structured.alertas_seguranca && msg.structured.alertas_seguranca.length > 0 && (
-                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                          <h3 className="text-red-400 font-bold flex items-center gap-1.5 mb-1.5 text-xs">
+                        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                          <h3 className="text-red-600 font-bold flex items-center gap-1.5 mb-1.5 text-xs">
                             <AlertTriangle className="h-3.5 w-3.5" /> Red Flags
                           </h3>
-                          <ul className="list-disc list-inside text-xs text-red-200/80 space-y-1">
+                          <ul className="list-disc list-inside text-xs text-red-700 space-y-1">
                             {msg.structured.alertas_seguranca.map((alerta, i) => (
                               <li key={i}>{alerta}</li>
                             ))}
@@ -172,12 +180,12 @@ export default function AssistentePage() {
 
                       {msg.structured.hipoteses_diagnosticas && msg.structured.hipoteses_diagnosticas.length > 0 && (
                         <div>
-                          <h3 className="text-gray-300 font-bold mb-2 flex items-center gap-1.5 text-xs">
-                            <CheckCircle className="h-3.5 w-3.5 text-cyan-400" /> Hipóteses
+                          <h3 className="text-gray-800 font-bold mb-2 flex items-center gap-1.5 text-xs">
+                            <CheckCircle className="h-3.5 w-3.5 text-green-600" /> Hipóteses
                           </h3>
                           <div className="flex flex-wrap gap-1.5">
                             {msg.structured.hipoteses_diagnosticas.map((hd, i) => (
-                              <span key={i} className="px-2 py-1 bg-black/40 border border-white/5 rounded-lg text-xs text-gray-300">
+                              <span key={i} className="px-2 py-1 bg-gray-100 border border-gray-200 rounded-lg text-xs text-gray-800">
                                 {hd}
                               </span>
                             ))}
@@ -187,29 +195,29 @@ export default function AssistentePage() {
 
                       {msg.structured.analise_tecnica && (
                         <div>
-                          <h3 className="text-primary font-bold mb-1 text-xs">Análise Clínica</h3>
-                          <p className="text-gray-400 text-xs leading-relaxed">{msg.structured.analise_tecnica}</p>
+                          <h3 className="text-teal-700 font-bold mb-1 text-xs">Análise Clínica</h3>
+                          <p className="text-gray-700 text-xs leading-relaxed">{msg.structured.analise_tecnica}</p>
                         </div>
                       )}
 
                       {msg.structured.conduta_sugerida && (
-                        <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                          <h3 className="text-white font-bold mb-1 text-xs">Conduta</h3>
-                          <p className="text-gray-300 text-xs leading-relaxed whitespace-pre-wrap">{msg.structured.conduta_sugerida}</p>
+                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                          <h3 className="text-gray-800 font-bold mb-1 text-xs">Conduta</h3>
+                          <p className="text-gray-700 text-xs leading-relaxed whitespace-pre-wrap">{msg.structured.conduta_sugerida}</p>
                         </div>
                       )}
 
                       {msg.structured.evidencia_base_conhecimento && msg.structured.evidencia_base_conhecimento.fonte && (
-                        <div className="border-t border-white/5 pt-3 mt-3 text-[10px]">
+                        <div className="border-t border-gray-200 pt-3 mt-3 text-[10px]">
                           <h3 className="font-semibold text-gray-500 uppercase flex items-center gap-1 mb-1">
                             <BookOpen className="h-3 w-3" /> Evidência
                           </h3>
-                          <div className="text-gray-400">
+                          <div className="text-gray-600">
                             <strong>Fonte:</strong> {msg.structured.evidencia_base_conhecimento.fonte} <br/>
                             <strong>Ref:</strong> {msg.structured.evidencia_base_conhecimento.referencia_resumida}
                             {msg.structured.evidencia_base_conhecimento.link_ou_doi && (
                               <div className="mt-1">
-                                <a href={msg.structured.evidencia_base_conhecimento.link_ou_doi.startsWith('http') ? msg.structured.evidencia_base_conhecimento.link_ou_doi : `https://doi.org/${msg.structured.evidencia_base_conhecimento.link_ou_doi}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                <a href={msg.structured.evidencia_base_conhecimento.link_ou_doi.startsWith('http') ? msg.structured.evidencia_base_conhecimento.link_ou_doi : `https://doi.org/${msg.structured.evidencia_base_conhecimento.link_ou_doi}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">
                                   Ver fonte ↗
                                 </a>
                               </div>
@@ -226,12 +234,12 @@ export default function AssistentePage() {
         ))}
         
         {loading && (
-          <div className="flex justify-start">
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl rounded-tl-sm p-4 shadow-sm flex items-center gap-2 text-primary text-sm font-medium">
+          <div className="flex justify-start z-10 relative">
+            <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm p-4 shadow-sm flex items-center gap-2 text-gray-500 text-sm font-medium">
               <span className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
               </span>
               digitando...
             </div>

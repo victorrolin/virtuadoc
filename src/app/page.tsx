@@ -118,12 +118,10 @@ export default async function Home() {
                 
                 {/* Container da Imagem Principal */}
                 <div className="relative rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl aspect-[4/5] sm:aspect-square lg:aspect-[4/5]">
-                  <Image 
+                  <img 
                     src="https://images.unsplash.com/photo-1576091160550-2173ff9e5ee4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
                     alt="Médica em Teleconsulta"
-                    fill
-                    className="object-cover"
-                    unoptimized
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                 </div>
@@ -144,13 +142,13 @@ export default async function Home() {
                 <div className="absolute bottom-12 -right-6 sm:-right-8 glass p-4 rounded-2xl border border-white/10 shadow-2xl animate-float" style={{ animationDelay: '1.5s' }}>
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-3">
-                      <div className="h-10 w-10 rounded-full bg-gray-600 border-2 border-[#0a0a0a] overflow-hidden">
-                        <Image src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" width={40} height={40} alt="Médico" className="object-cover h-full w-full" unoptimized />
+                      <div className="h-10 w-10 rounded-full bg-gray-600 border-2 border-[#0a0a0a] overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" alt="Médico" className="object-cover h-full w-full absolute inset-0" />
                       </div>
-                      <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden">
-                        <Image src="https://images.unsplash.com/photo-1594824436998-efa5c39fe385?auto=format&fit=crop&w=100&q=80" width={40} height={40} alt="Médica" className="object-cover h-full w-full" unoptimized />
+                      <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1594824436998-efa5c39fe385?auto=format&fit=crop&w=100&q=80" alt="Médica" className="object-cover h-full w-full absolute inset-0" />
                       </div>
-                      <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center relative z-10">
                         <span className="text-xs font-bold text-black">+50</span>
                       </div>
                     </div>

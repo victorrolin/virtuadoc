@@ -12,14 +12,18 @@ export default async function Home() {
     .eq('role', 'doctor')
     .limit(6)
 
-  // Extrair especialidades únicas (case-insensitive)
+  // Extrair especialidades únicas (case-insensitive e accent-insensitive)
   const allSpecs = doctors?.flatMap(d =>
     d.specialties ? d.specialties.split(',').map((s: string) => s.trim()) : []
   ) || []
-  // Deduplica ignorando maiúsculas/minúsculas, mantendo a primeira ocorrência
+
+  // Função para normalizar strings (remover acentos e colocar em lowercase)
+  const normalize = (str: string) => 
+    str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+
   const seen = new Set<string>()
   const uniqueSpecs = allSpecs.filter(s => {
-    const key = s.toLowerCase()
+    const key = normalize(s)
     if (seen.has(key)) return false
     seen.add(key)
     return true
@@ -176,8 +180,14 @@ export default async function Home() {
               {uniqueSpecs.length > 0 ? uniqueSpecs.map(spec => (
                 <Link key={spec} href={`/medicos?especialidade=${encodeURIComponent(spec)}`}
                   className="group glass p-5 rounded-2xl text-center hover:bg-primary/10 hover:border-primary/20 border border-white/5 transition-all hover:scale-105">
-                  <div className="text-3xl mb-3">{specIcons[spec] || '⚕️'}</div>
-                  <p className="text-sm font-semibold text-white group-hover:text-primary transition-colors">{spec}</p>
+                  <div className="text-3xl mb-3">
+                    {(() => {
+                      const normalizedSpec = normalize(spec);
+                      const iconKey = Object.keys(specIcons).find(k => normalize(k) === normalizedSpec);
+                      return iconKey ? specIcons[iconKey] : '⚕️';
+                    })()}
+                  </div>
+                  <p className="text-sm font-semibold text-white group-hover:text-primary transition-colors capitalize">{spec}</p>
                 </Link>
               )) : (
                 // Especialidades de exemplo se não houver médicos cadastrados

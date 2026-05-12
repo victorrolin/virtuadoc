@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Bot, Send, AlertTriangle, CheckCircle, Activity, BookOpen, User } from 'lucide-react'
+import { Send, AlertTriangle, CheckCircle, Activity, BookOpen, Stethoscope } from 'lucide-react'
 
 interface AssitantResponse {
   status_prioridade?: string
@@ -99,11 +99,11 @@ export default function AssistentePage() {
       {/* Header tipo WhatsApp */}
       <div className="flex-shrink-0 bg-[#070707] border-b border-white/5 p-4 flex items-center gap-4 rounded-t-2xl z-10">
         <div className="h-12 w-12 bg-primary/20 rounded-full flex items-center justify-center border border-primary/30 relative">
-          <Bot className="h-6 w-6 text-primary" />
+          <Stethoscope className="h-6 w-6 text-primary" />
           <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-[#070707] rounded-full"></div>
         </div>
         <div>
-          <h1 className="text-lg font-bold text-white">Assistente IA (CDSS)</h1>
+          <h1 className="text-lg font-bold text-white">Dr. Virtua</h1>
           <p className="text-xs text-primary">online</p>
         </div>
       </div>

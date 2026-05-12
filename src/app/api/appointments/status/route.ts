@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, updated: count })
+    return NextResponse.json({ success: true })
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Erro interno.' }, { status: 500 })
   }

@@ -119,7 +119,7 @@ export default async function Home() {
                 {/* Container da Imagem Principal */}
                 <div className="relative rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl min-h-[450px] lg:min-h-[600px] h-full">
                   <img 
-                    src="https://images.unsplash.com/photo-1576091160550-2173ff9e5ee4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                    src="https://images.unsplash.com/photo-1559839734-2b71f1e3b778?auto=format&fit=crop&w=1000&q=80" 
                     alt="Médica em Teleconsulta"
                     className="w-full h-full object-cover"
                   />
@@ -146,7 +146,7 @@ export default async function Home() {
                         <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" alt="Médico" className="object-cover h-full w-full" />
                       </div>
                       <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1594824436998-efa5c39fe385?auto=format&fit=crop&w=100&q=80" alt="Médica" className="object-cover h-full w-full" />
+                        <img src="https://images.unsplash.com/photo-1582750433449-64c01bd03f07?auto=format&fit=crop&w=100&q=80" alt="Médica" className="object-cover h-full w-full" />
                       </div>
                       <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center">
                         <span className="text-xs font-bold text-black">+50</span>

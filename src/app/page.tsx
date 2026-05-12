@@ -119,7 +119,7 @@ export default async function Home() {
                 {/* Container da Imagem Principal */}
                 <div className="relative rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl min-h-[450px] lg:min-h-[600px] h-full">
                   <img 
-                    src="https://images.unsplash.com/photo-1559839734-2b71f1e3b778?auto=format&fit=crop&w=1000&q=80" 
+                    src="/images/hero-doctor.png" 
                     alt="Médica em Teleconsulta"
                     className="w-full h-full object-cover"
                   />
@@ -143,10 +143,10 @@ export default async function Home() {
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-3">
                       <div className="h-10 w-10 rounded-full bg-gray-600 border-2 border-[#0a0a0a] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" alt="Médico" className="object-cover h-full w-full" />
+                        <img src="/images/doctor-1.png" alt="Médico" className="object-cover h-full w-full" />
                       </div>
                       <div className="h-10 w-10 rounded-full bg-gray-500 border-2 border-[#0a0a0a] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1582750433449-64c01bd03f07?auto=format&fit=crop&w=100&q=80" alt="Médica" className="object-cover h-full w-full" />
+                        <img src="/images/doctor-2.png" alt="Médica" className="object-cover h-full w-full" />
                       </div>
                       <div className="h-10 w-10 rounded-full bg-primary border-2 border-[#0a0a0a] flex items-center justify-center">
                         <span className="text-xs font-bold text-black">+50</span>

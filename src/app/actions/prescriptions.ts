@@ -20,7 +20,9 @@ export async function saveAndSendPrescription(data: {
   // Or just save the JSON content
   
   // 3. Return a success message and a link for the doctor to share
-  const shareLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'}/prescriptions/${data.appointmentId}`
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
+  const medsQuery = encodeURIComponent(JSON.stringify(data.medications))
+  const shareLink = `${baseUrl}/prescriptions/${data.appointmentId}?p=${encodeURIComponent(data.patientName)}&d=${encodeURIComponent(data.doctorName)}&m=${medsQuery}&n=${encodeURIComponent(data.notes || '')}`
   
   return { 
     success: true, 

@@ -1,16 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, XCircle, Loader2, AlertTriangle } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader2, AlertTriangle, FileText } from 'lucide-react'
+import { PrescriptionModal } from './PrescriptionModal'
 
 interface Props {
   appointmentId: string
+  patientName?: string
+  doctorName?: string
 }
 
-export function AppointmentActions({ appointmentId }: Props) {
+export function AppointmentActions({ appointmentId, patientName = 'Paciente', doctorName = 'Médico' }: Props) {
   const [loading, setLoading] = useState(false)
   const [pending, setPending] = useState<'completed' | 'cancelled' | null>(null)
   const [error, setError] = useState('')
+  const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false)
 
   async function execute(status: 'completed' | 'cancelled') {
     setLoading(true)
@@ -81,17 +85,34 @@ export function AppointmentActions({ appointmentId }: Props) {
   return (
     <div className="flex items-center gap-2 flex-shrink-0">
       <button
+        onClick={() => setIsPrescriptionOpen(true)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 text-xs font-semibold transition-all"
+      >
+        <FileText className="h-3.5 w-3.5" /> Receita
+      </button>
+
+      <button
         onClick={() => setPending('completed')}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 text-xs font-semibold transition-all"
       >
         <CheckCircle2 className="h-3.5 w-3.5" /> Concluir
       </button>
+
       <button
         onClick={() => setPending('cancelled')}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
       >
         <XCircle className="h-3.5 w-3.5" /> Cancelar
       </button>
+
+      <PrescriptionModal
+        isOpen={isPrescriptionOpen}
+        onClose={() => setIsPrescriptionOpen(false)}
+        appointmentId={appointmentId}
+        patientName={patientName}
+        doctorName={doctorName}
+      />
     </div>
   )
 }
+

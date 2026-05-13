@@ -162,7 +162,11 @@ export default async function ConsultasPage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-shrink-0">
-                    <AppointmentActions appointmentId={appt.id} />
+                    <AppointmentActions 
+                      appointmentId={appt.id} 
+                      patientName={patient?.full_name}
+                      doctorName={profile?.full_name}
+                    />
                     <a
                       href={meetLink}
                       target="_blank"

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Calendar, Users, Video, Clock, ArrowRight, Activity, Edit3, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { DashboardPrescriptionButton } from '@/components/DashboardPrescriptionButton'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -274,6 +275,8 @@ export default async function DashboardPage() {
         {/* Coluna Direita - Atalhos do Dr. Virtua */}
         {isDoctor && (
           <div className="space-y-6">
+            <DashboardPrescriptionButton doctorName={profile?.full_name || 'Médico'} />
+
             <div className="glass rounded-2xl p-6 border border-primary/20 bg-primary/5 relative overflow-hidden">
               <div className="absolute -top-6 -right-6 h-20 w-20 bg-primary/10 rounded-full blur-2xl"></div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">

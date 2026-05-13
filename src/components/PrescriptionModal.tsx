@@ -22,13 +22,18 @@ interface Medication {
   instructions: string
 }
 
-export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName, doctorName }: PrescriptionModalProps) {
+export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName: initialPatientName, doctorName }: PrescriptionModalProps) {
+  const [patientName, setPatientName] = useState(initialPatientName || '')
   const [medications, setMedications] = useState<Medication[]>([
     { id: '1', name: '', dosage: '', instructions: '' }
   ])
   const [additionalNotes, setAdditionalNotes] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [result, setResult] = useState<{ shareLink: string, whatsappLink: string } | null>(null)
+
+  useEffect(() => {
+    if (initialPatientName) setPatientName(initialPatientName)
+  }, [initialPatientName])
 
   const addMedication = () => {
     setMedications([...medications, { id: Math.random().toString(36).substr(2, 9), name: '', dosage: '', instructions: '' }])
@@ -45,6 +50,10 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName,
   }
 
   const handleGenerate = async () => {
+    if (!patientName) {
+      alert('Por favor, informe o nome do paciente.')
+      return
+    }
     if (medications.some(m => !m.name)) {
       alert('Por favor, preencha o nome de todos os medicamentos.')
       return
@@ -53,7 +62,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName,
     setIsGenerating(true)
     try {
       const res = await saveAndSendPrescription({
-        appointmentId,
+        appointmentId: appointmentId || 'manual-' + Date.now(),
         medications,
         notes: additionalNotes,
         patientName,
@@ -95,9 +104,21 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName,
                 <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
                   <FileText className="text-primary h-5 w-5" />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <h2 className="text-xl font-bold text-white">Nova Receita Digital</h2>
-                  <p className="text-xs text-gray-400">Paciente: <span className="text-gray-200">{patientName}</span></p>
+                  {!appointmentId ? (
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-[10px] bg-white/10 text-gray-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Manual</span>
+                      <input 
+                        value={patientName}
+                        onChange={(e) => setPatientName(e.target.value)}
+                        placeholder="Digite o nome do paciente..."
+                        className="bg-transparent border-none p-0 text-xs text-primary focus:ring-0 placeholder-gray-600 w-full"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400">Paciente: <span className="text-gray-200">{patientName}</span></p>
+                  )}
                 </div>
               </div>
               <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors">

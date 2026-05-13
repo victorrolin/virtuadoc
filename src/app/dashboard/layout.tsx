@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircle, Stethoscope } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import { BackButton } from '@/components/BackButton'
+import { SidebarPrescriptionButton } from '@/components/SidebarPrescriptionButton'
 
 export default async function DashboardLayout({
   children,
@@ -65,6 +66,11 @@ export default async function DashboardLayout({
                   <UserCircle className="h-5 w-5" />
                   Meu Perfil
                 </Link>
+                
+                <div className="pt-2 pb-2">
+                  <SidebarPrescriptionButton doctorName={profile?.full_name || 'Médico'} />
+                </div>
+
                 <Link href="/dashboard/assistente" className="flex items-center gap-3 px-4 py-3 rounded-xl text-primary hover:bg-primary/10 font-bold transition-colors bg-primary/5 border border-primary/20">
                   <Stethoscope className="h-5 w-5" />
                   Dr. Virtua (IA)

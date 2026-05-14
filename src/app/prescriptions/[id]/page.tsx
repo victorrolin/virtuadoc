@@ -5,22 +5,39 @@ import { Pill, Calendar, User, Printer, FileText, CheckCircle2 } from 'lucide-re
 import { PrintButton } from '@/components/PrintButton'
 
 export default async function PrescriptionPage({ 
-  params,
-  searchParams 
+  params: paramsPromise,
+  searchParams: searchParamsPromise 
 }: { 
-  params: { id: string },
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ id: string }>,
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const params = await paramsPromise
+  const searchParams = await searchParamsPromise
   const { id } = params
   
   try {
     const supabase = await createClient()
 
     // Dados da URL (Next.js já fornece decodificado em searchParams)
-    const manualPatient = Array.isArray(searchParams.p) ? searchParams.p[0] : searchParams.p
-    const manualDoctor = Array.isArray(searchParams.d) ? searchParams.d[0] : searchParams.d
-    const manualMeds = Array.isArray(searchParams.m) ? searchParams.m[0] : searchParams.m
-    const manualNotes = Array.isArray(searchParams.n) ? searchParams.n[0] : searchParams.n
+    const rawData = Array.isArray(searchParams.data) ? searchParams.data[0] : searchParams.data
+    
+    let manualPatient = Array.isArray(searchParams.p) ? searchParams.p[0] : searchParams.p
+    let manualDoctor = Array.isArray(searchParams.d) ? searchParams.d[0] : searchParams.d
+    let manualMedsRaw = Array.isArray(searchParams.m) ? searchParams.m[0] : searchParams.m
+    let manualNotes = Array.isArray(searchParams.n) ? searchParams.n[0] : searchParams.n
+
+    // Se houver dados em Base64, prioriza eles (evita cortes na URL)
+    if (rawData) {
+      try {
+        const decoded = JSON.parse(Buffer.from(rawData, 'base64').toString())
+        manualPatient = decoded.p
+        manualDoctor = decoded.d
+        manualMedsRaw = JSON.stringify(decoded.m)
+        manualNotes = decoded.n
+      } catch (e) {
+        console.error('Erro ao decodificar Base64:', e)
+      }
+    }
 
     let appointment: any = null
     
@@ -50,9 +67,9 @@ export default async function PrescriptionPage({
     const dateStr = appointment?.appointment_date || new Date().toISOString()
     
     let medications: any[] = []
-    if (manualMeds) {
+    if (manualMedsRaw) {
       try {
-        const parsed = JSON.parse(manualMeds)
+        const parsed = JSON.parse(manualMedsRaw)
         medications = Array.isArray(parsed) ? parsed : []
       } catch (e) {
         console.error('Erro ao processar JSON de medicamentos')

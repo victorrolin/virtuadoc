@@ -73,9 +73,13 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
         doctorName
       })
       
-      if (res.success && res.shareLink && res.whatsappLink) {
+      if (res.success && res.shareLink) {
         console.log('DEBUG: Generated shareLink', res.shareLink)
-        setResult({ id: res.id, shareLink: res.shareLink, whatsappLink: res.whatsappLink })
+        setResult({ 
+          id: res.id, 
+          shareLink: res.shareLink, 
+          whatsappLink: res.whatsappLink || '' 
+        })
       } else {
         alert(res.error || 'Erro ao gerar os links da receita.')
       }
@@ -232,18 +236,18 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                         </div>
                       )}
 
-                      {isSigned && result.whatsappLink && (
-                        <motion.a 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          href={result.whatsappLink}
+                      {isSigned && result && (
+                        <a 
+                          href={result.whatsappLink || `https://wa.me/?text=${encodeURIComponent(
+                            `Olá ${patientName}, aqui está sua receita digital da consulta com Dr(a). ${doctorName}: ${result.shareLink}`
+                          )}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center justify-center gap-2 w-full py-4 bg-[#25D366] text-black font-extrabold rounded-xl hover:bg-[#25D366]/90 transition-all shadow-lg shadow-[#25D366]/20"
                         >
                           <Send className="h-5 w-5" />
                           ENVIAR PDF ASSINADO (WhatsApp)
-                        </motion.a>
+                        </a>
                       )}
                     </div>
                 </motion.div>

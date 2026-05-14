@@ -58,7 +58,7 @@ export default async function PrescriptionPage({
     // Buscar dados extras de assinatura se existir no histórico
     const { data: dbPrescription } = await supabase
       .from('prescriptions')
-      .select('is_signed, signed_file_url')
+      .select('is_signed, signed_file_url, patient_name, medications, notes')
       .or(`appointment_id.eq.${id},id.eq.${id.replace('manual-', '')}`)
       .maybeSingle()
 
@@ -72,7 +72,7 @@ export default async function PrescriptionPage({
       crm: appointment?.doctor?.crm || 'Consulte o Assinador' 
     }
     const patient = { 
-      full_name: manualPatient || appointment?.patient?.full_name || 'Paciente' 
+      full_name: manualPatient || dbPrescription?.patient_name || appointment?.patient?.full_name || 'Paciente' 
     }
     const dateStr = appointment?.appointment_date || new Date().toISOString()
     
@@ -84,6 +84,12 @@ export default async function PrescriptionPage({
       } catch (e) {
         console.error('Erro ao processar JSON de medicamentos')
       }
+    } else if (dbPrescription?.medications) {
+      medications = Array.isArray(dbPrescription.medications) ? dbPrescription.medications : []
+    }
+
+    if (!manualNotes && dbPrescription?.notes) {
+      manualNotes = dbPrescription.notes
     }
 
     return (

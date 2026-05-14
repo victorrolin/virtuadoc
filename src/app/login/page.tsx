@@ -62,6 +62,7 @@ function LoginForm() {
       {/* Tabs */}
       <div className="flex rounded-xl bg-black/30 p-1 mb-6 border border-white/5">
         <button
+          id="patient-tab"
           type="button"
           onClick={() => { setTab('magic'); setErrorMsg(''); setMagicSent(false) }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === 'magic' ? 'bg-primary text-black' : 'text-gray-400 hover:text-white'}`}
@@ -70,6 +71,7 @@ function LoginForm() {
           Sou Paciente
         </button>
         <button
+          id="admin-tab"
           type="button"
           onClick={() => { setTab('password'); setErrorMsg(''); setMagicSent(false) }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === 'password' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}

@@ -22,14 +22,19 @@ export async function saveAndSendPrescription(data: {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
     
     // Empacotar tudo em um objeto e transformar em Base64 para evitar que a URL seja cortada
-    const prescriptionData = {
+    const prescriptionData = JSON.stringify({
       p: data.patientName || 'Paciente',
       d: data.doctorName || 'Médico',
       m: data.medications || [],
       n: data.notes || ''
-    }
-    const encodedData = Buffer.from(JSON.stringify(prescriptionData)).toString('base64')
-    const shareLink = `${baseUrl}/prescriptions/${data.appointmentId}?data=${encodedData}`
+    })
+    
+    const encodedData = Buffer.from(prescriptionData).toString('base64')
+    
+    const params = new URLSearchParams()
+    params.set('data', encodedData)
+    
+    const shareLink = `${baseUrl}/prescriptions/${data.appointmentId}?${params.toString()}`
     
     return { 
       success: true, 

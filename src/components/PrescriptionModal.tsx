@@ -70,6 +70,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
       })
       
       if (res.success && res.shareLink && res.whatsappLink) {
+        console.log('DEBUG: Generated shareLink', res.shareLink)
         setResult({ shareLink: res.shareLink, whatsappLink: res.whatsappLink })
       } else {
         alert(res.error || 'Erro ao gerar os links da receita.')

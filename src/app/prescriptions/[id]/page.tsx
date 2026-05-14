@@ -78,75 +78,88 @@ export default async function PrescriptionPage({
 
     return (
       <div className="min-h-screen bg-white text-gray-900 p-8 font-serif">
-        <div id="prescription-card" className="max-w-3xl mx-auto border-2 border-gray-100 p-12 shadow-sm relative overflow-hidden bg-white">
-          {/* Watermark */}
-          <div className="absolute top-0 right-0 p-4 opacity-5">
-            <FileText className="h-64 w-64 text-primary rotate-12" />
-          </div>
-          {/* ... resto do conteúdo do card ... */}
-          {/* Header */}
-          <div className="flex justify-between items-start border-b-2 border-primary/20 pb-8 mb-8 relative">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">VIRTUA<span className="text-primary">DOC</span></h1>
-              <p className="text-sm text-gray-500 font-sans mt-1">Telemedicina Premium e Conectada</p>
-            </div>
-            <div className="text-right font-sans">
-              <h2 className="text-xl font-bold text-gray-800">Receituário Digital</h2>
-              <p className="text-xs text-gray-400">ID: {id?.slice(0, 12).toUpperCase()}</p>
-            </div>
-          </div>
+        <style dangerouslySetInnerHTML={{ __html: `
+          @media print {
+            @page { size: portrait; margin: 10mm; }
+            body { -webkit-print-color-adjust: exact; }
+            .no-print { display: none !important; }
+          }
+          #prescription-card {
+            page-break-inside: avoid;
+          }
+        ` }} />
 
-          {/* Patient & Doctor */}
-          <div className="grid grid-cols-2 gap-8 mb-12 font-sans">
-            <div className="space-y-1">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Paciente</p>
-              <p className="text-lg font-bold text-gray-900">{patient.full_name}</p>
-            </div>
-            <div className="space-y-1 text-right">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Médico Responsável</p>
-              <p className="text-lg font-bold text-gray-900">{doctor.full_name}</p>
-              <p className="text-xs text-primary font-medium">{doctor.specialties}</p>
-              <p className="text-[10px] text-gray-500 italic">CRM: {doctor.crm}</p>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="space-y-8 min-h-[350px] relative">
-            <div className="flex items-center gap-2 text-primary/80 border-b border-gray-100 pb-2 mb-6">
-              <Pill className="h-5 w-5" />
-              <h3 className="text-sm uppercase tracking-widest font-bold">Prescrição Médica</h3>
+        <div id="prescription-card" className="max-w-3xl mx-auto border-2 border-gray-100 p-12 shadow-sm relative overflow-hidden bg-white min-h-[1050px] flex flex-col justify-between">
+          <div>
+            {/* Watermark */}
+            <div className="absolute top-0 right-0 p-4 opacity-5">
+              <FileText className="h-64 w-64 text-primary rotate-12" />
             </div>
 
-            <div className="space-y-6">
-               {medications.length > 0 ? (
-                 medications.map((med: any, index: number) => (
-                   <div key={index} className="space-y-1">
-                     <div className="flex items-baseline gap-2">
-                       <span className="text-gray-400 font-bold">{index + 1}.</span>
-                       <p className="text-lg font-bold text-gray-900">{med.name}</p>
-                       <span className="text-sm text-gray-400 font-sans flex-1 border-b border-dotted border-gray-200 mb-1 mx-2"></span>
-                       <span className="text-sm text-gray-500 font-sans">{med.dosage}</span>
+            {/* Header */}
+            <div className="flex justify-between items-start border-b-2 border-primary/20 pb-8 mb-8 relative">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">VIRTUA<span className="text-primary">DOC</span></h1>
+                <p className="text-sm text-gray-500 font-sans mt-1">Telemedicina Premium e Conectada</p>
+              </div>
+              <div className="text-right font-sans">
+                <h2 className="text-xl font-bold text-gray-800">Receituário Digital</h2>
+                <p className="text-xs text-gray-400">ID: {id?.slice(0, 12).toUpperCase()}</p>
+              </div>
+            </div>
+
+            {/* Patient & Doctor */}
+            <div className="grid grid-cols-2 gap-8 mb-12 font-sans">
+              <div className="space-y-1">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Paciente</p>
+                <p className="text-lg font-bold text-gray-900">{patient.full_name}</p>
+              </div>
+              <div className="space-y-1 text-right">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Médico Responsável</p>
+                <p className="text-lg font-bold text-gray-900">{doctor.full_name}</p>
+                <p className="text-xs text-primary font-medium">{doctor.specialties}</p>
+                <p className="text-[10px] text-gray-500 italic">CRM: {doctor.crm}</p>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-8 min-h-[350px] relative">
+              <div className="flex items-center gap-2 text-primary/80 border-b border-gray-100 pb-2 mb-6">
+                <Pill className="h-5 w-5" />
+                <h3 className="text-sm uppercase tracking-widest font-bold">Prescrição Médica</h3>
+              </div>
+
+              <div className="space-y-6">
+                 {medications.length > 0 ? (
+                   medications.map((med: any, index: number) => (
+                     <div key={index} className="space-y-1">
+                       <div className="flex items-baseline gap-2">
+                         <span className="text-gray-400 font-bold">{index + 1}.</span>
+                         <p className="text-lg font-bold text-gray-900">{med.name}</p>
+                         <span className="text-sm text-gray-400 font-sans flex-1 border-b border-dotted border-gray-200 mb-1 mx-2"></span>
+                         <span className="text-sm text-gray-500 font-sans">{med.dosage}</span>
+                       </div>
+                       <p className="text-sm text-gray-600 font-sans pl-6 italic">{med.instructions}</p>
                      </div>
-                     <p className="text-sm text-gray-600 font-sans pl-6 italic">{med.instructions}</p>
-                   </div>
-                 ))
-               ) : (
-                  <p className="text-gray-400 italic font-sans py-12 text-center border border-dashed border-gray-100 rounded-xl">
-                    Nenhum medicamento informado na prescrição digital.
-                  </p>
-               )}
+                   ))
+                 ) : (
+                    <p className="text-gray-400 italic font-sans py-12 text-center border border-dashed border-gray-100 rounded-xl">
+                      Nenhum medicamento informado na prescrição digital.
+                    </p>
+                 )}
 
-               {manualNotes && (
-                 <div className="mt-12 pt-8 border-t border-dashed border-gray-100">
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Observações Adicionais</p>
-                    <p className="text-sm text-gray-600 font-sans leading-relaxed whitespace-pre-wrap">{manualNotes}</p>
-                 </div>
-               )}
+                 {manualNotes && (
+                   <div className="mt-12 pt-8 border-t border-dashed border-gray-100">
+                      <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Observações Adicionais</p>
+                      <p className="text-sm text-gray-600 font-sans leading-relaxed whitespace-pre-wrap">{manualNotes}</p>
+                   </div>
+                 )}
+              </div>
             </div>
           </div>
 
-          {/* Footer - Protegido contra quebras de página */}
-          <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end font-sans" style={{ breakInside: 'avoid' }}>
+          {/* Footer - Forçado a ficar no final e não quebrar */}
+          <div className="mt-auto pt-8 border-t border-gray-100 flex justify-between items-end font-sans" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-green-600 text-xs font-bold">
                 <CheckCircle2 className="h-4 w-4" />
@@ -164,60 +177,40 @@ export default async function PrescriptionPage({
               <p className="text-[10px] text-gray-500 uppercase tracking-tighter">Assinatura Digital</p>
             </div>
           </div>
+        </div>
 
-          <div className="mt-12 flex justify-center print:hidden">
-            <PrintButton />
-          </div>
+        <div className="mt-12 flex justify-center no-print">
+          <PrintButton />
         </div>
         
         {searchParams.print && (
           <>
-            <div id="download-overlay" className="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] flex flex-col items-center justify-center text-white print:hidden">
+            <div id="download-overlay" className="fixed inset-0 bg-black/90 backdrop-blur-md z-[9999] flex flex-col items-center justify-center text-white no-print">
               <div className="h-16 w-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-              <p className="text-xl font-bold">Gerando sua Receita PDF...</p>
-              <p className="text-gray-400 text-sm mt-2">O download começará em instantes.</p>
+              <p className="text-xl font-bold uppercase tracking-widest">Iniciando Download...</p>
+              <p className="text-gray-400 text-sm mt-2">Sua receita está sendo preparada.</p>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
             <script dangerouslySetInnerHTML={{ __html: `
-              function startDownload() {
+              function runPDF() {
                 if (typeof html2pdf === 'undefined') {
-                  setTimeout(startDownload, 200);
+                  setTimeout(runPDF, 300);
                   return;
                 }
-                
                 const element = document.getElementById('prescription-card');
-                const opt = {
-                  margin: [10, 10, 15, 10],
-                  filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
-                  image: { type: 'jpeg', quality: 0.95 },
-                  html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    logging: false,
-                    letterRendering: true,
-                    backgroundColor: '#ffffff'
-                  },
-                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                  pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
-                
-                html2pdf().set(opt).from(element).save().then(() => {
-                  setTimeout(() => {
-                    document.getElementById('download-overlay').style.display = 'none';
-                  }, 500);
-                }).catch(err => {
-                  console.error('Erro detalhado:', err);
+                html2pdf().from(element).set({
+                  margin: 10,
+                  filename: 'Receita.pdf',
+                  html2canvas: { scale: 2, useCORS: true },
+                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                }).save().then(() => {
                   document.getElementById('download-overlay').style.display = 'none';
-                  // Fallback para impressão do navegador se o download direto falhar
+                }).catch(err => {
                   window.print();
+                  document.getElementById('download-overlay').style.display = 'none';
                 });
               }
-
-              if (document.readyState === 'complete') {
-                setTimeout(startDownload, 1000);
-              } else {
-                window.addEventListener('load', () => setTimeout(startDownload, 1000));
-              }
+              window.addEventListener('load', () => setTimeout(runPDF, 1500));
             ` }} />
           </>
         )}

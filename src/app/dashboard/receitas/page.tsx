@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { getPrescriptionHistory } from '@/app/actions/prescriptionHistory'
-// ... resto dos imports ...
 import { uploadSignedPrescription } from '@/app/actions/uploadPrescription'
+import { deletePrescription } from '@/app/actions/deletePrescription'
 import { createClient } from '@/lib/supabase/client'
-import { FileText, Search, Send, Download, Loader2, Calendar, User, CheckCircle2, Upload } from 'lucide-react'
+import { FileText, Search, Send, Download, Loader2, Calendar, User, CheckCircle2, Upload, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function PrescriptionHistoryPage() {
@@ -72,6 +72,22 @@ export default function PrescriptionHistoryPage() {
     }
   }
 
+  async function handleDelete(id: string) {
+    if (!confirm('Tem certeza que deseja excluir esta receita do histórico?')) return
+
+    try {
+      const res = await deletePrescription(id)
+      if (res.success) {
+        load()
+      } else {
+        alert('Erro ao excluir: ' + res.error)
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Erro ao excluir receita.')
+    }
+  }
+
   const filteredPrescriptions = prescriptions.filter(p => 
     p.patient_name?.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -121,15 +137,22 @@ export default function PrescriptionHistoryPage() {
           {filteredPrescriptions.map((p) => {
             const link = generateLink(p)
             return (
-              <div key={p.id} className="glass p-5 rounded-2xl border border-white/5 hover:border-primary/30 transition-all group">
+              <div key={p.id} className="glass p-5 rounded-2xl border border-white/5 hover:border-primary/30 transition-all group relative">
                 <div className="flex justify-between items-start mb-4">
                   <div className={`h-10 w-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${p.is_signed ? 'bg-green-500/10 text-green-500' : 'bg-primary/10 text-primary'}`}>
                     <FileText className="h-5 w-5" />
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center gap-2">
                     <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ${p.is_signed ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}`}>
                       {p.is_signed ? 'Assinada (Gov.br)' : 'Aguardando Assinatura'}
                     </span>
+                    <button 
+                      onClick={() => handleDelete(p.id)}
+                      className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                      title="Excluir receita"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
 

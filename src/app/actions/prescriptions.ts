@@ -10,25 +10,32 @@ export async function saveAndSendPrescription(data: {
   patientName: string,
   doctorName: string
 }) {
-  const supabase = await createClient()
-
-  // 1. In a real scenario, we would save to a 'prescriptions' table
-  // For now, let's just log it and simulate success
-  console.log('Saving prescription for appointment:', data.appointmentId)
-  
-  // 2. Here we could generate a PDF and store it in Supabase Storage
-  // Or just save the JSON content
-  
-  // 3. Return a success message and a link for the doctor to share
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
-  const medsQuery = encodeURIComponent(JSON.stringify(data.medications))
-  const shareLink = `${baseUrl}/prescriptions/${data.appointmentId}?p=${encodeURIComponent(data.patientName)}&d=${encodeURIComponent(data.doctorName)}&m=${medsQuery}&n=${encodeURIComponent(data.notes || '')}`
-  
-  return { 
-    success: true, 
-    shareLink,
-    whatsappLink: `https://wa.me/?text=${encodeURIComponent(
-      `Olá ${data.patientName}, aqui está sua receita digital da consulta com Dr(a). ${data.doctorName}: ${shareLink}`
-    )}`
+  try {
+    // 1. In a real scenario, we would save to a 'prescriptions' table
+    // For now, let's just log it and simulate success
+    console.log('Generating prescription link for:', data.patientName)
+    
+    // 2. Here we could generate a PDF and store it in Supabase Storage
+    // Or just save the JSON content
+    
+    // 3. Return a success message and a link for the doctor to share
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
+    const medsQuery = encodeURIComponent(JSON.stringify(data.medications || []))
+    const patientNameQuery = encodeURIComponent(data.patientName || 'Paciente')
+    const doctorNameQuery = encodeURIComponent(data.doctorName || 'Médico')
+    const notesQuery = encodeURIComponent(data.notes || '')
+    
+    const shareLink = `${baseUrl}/prescriptions/${data.appointmentId}?p=${patientNameQuery}&d=${doctorNameQuery}&m=${medsQuery}&n=${notesQuery}`
+    
+    return { 
+      success: true, 
+      shareLink,
+      whatsappLink: `https://wa.me/?text=${encodeURIComponent(
+        `Olá ${data.patientName}, aqui está sua receita digital da consulta com Dr(a). ${data.doctorName}: ${shareLink}`
+      )}`
+    }
+  } catch (error: any) {
+    console.error('Error in saveAndSendPrescription:', error)
+    return { success: false, error: error?.message || 'Erro interno na geração da receita.' }
   }
 }

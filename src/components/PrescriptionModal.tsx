@@ -100,28 +100,29 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/5">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                  <FileText className="text-primary h-5 w-5" />
+              <div className="flex items-center gap-4 w-full mr-8">
+                <div className="h-12 w-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <FileText className="text-primary h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold text-white">Nova Receita Digital</h2>
+                  <h2 className="text-lg font-bold text-white leading-tight">Nova Receita Digital</h2>
                   {!appointmentId ? (
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="text-[10px] bg-white/10 text-gray-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Manual</span>
+                    <div className="mt-1 flex flex-col">
+                      <label className="text-[9px] uppercase tracking-widest font-black text-primary mb-1">Paciente</label>
                       <input 
                         value={patientName}
                         onChange={(e) => setPatientName(e.target.value)}
-                        placeholder="Digite o nome do paciente..."
-                        className="bg-transparent border-none p-0 text-xs text-primary focus:ring-0 placeholder-gray-600 w-full"
+                        placeholder="Clique aqui e digite o nome completo..."
+                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-base font-bold text-white focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none placeholder-gray-600 w-full transition-all"
+                        autoFocus
                       />
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-400">Paciente: <span className="text-gray-200">{patientName}</span></p>
+                    <p className="text-sm text-gray-400 mt-0.5">Paciente: <span className="text-white font-bold">{patientName}</span></p>
                   )}
                 </div>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0">
                 <X className="h-5 w-5 text-gray-400" />
               </button>
             </div>

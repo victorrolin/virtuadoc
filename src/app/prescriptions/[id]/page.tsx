@@ -78,12 +78,12 @@ export default async function PrescriptionPage({
 
     return (
       <div className="min-h-screen bg-white text-gray-900 p-8 font-serif">
-        <div className="max-w-3xl mx-auto border-2 border-gray-100 p-12 shadow-sm relative overflow-hidden">
+        <div id="prescription-card" className="max-w-3xl mx-auto border-2 border-gray-100 p-12 shadow-sm relative overflow-hidden bg-white">
           {/* Watermark */}
           <div className="absolute top-0 right-0 p-4 opacity-5">
             <FileText className="h-64 w-64 text-primary rotate-12" />
           </div>
-
+          {/* ... resto do conteúdo do card ... */}
           {/* Header */}
           <div className="flex justify-between items-start border-b-2 border-primary/20 pb-8 mb-8 relative">
             <div>
@@ -172,27 +172,43 @@ export default async function PrescriptionPage({
         
         {searchParams.print && (
           <>
+            <div id="download-overlay" className="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] flex flex-col items-center justify-center text-white print:hidden">
+              <div className="h-16 w-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+              <p className="text-xl font-bold">Gerando sua Receita PDF...</p>
+              <p className="text-gray-400 text-sm mt-2">O download começará em instantes.</p>
+            </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
             <script dangerouslySetInnerHTML={{ __html: `
               function startDownload() {
                 if (typeof html2pdf === 'undefined') {
-                  setTimeout(startDownload, 500);
+                  setTimeout(startDownload, 200);
                   return;
                 }
                 
-                const element = document.querySelector('.max-w-3xl');
+                const element = document.getElementById('prescription-card');
                 const opt = {
                   margin: [15, 15, 20, 15],
                   filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
                   image: { type: 'jpeg', quality: 0.98 },
-                  html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                  html2canvas: { scale: 3, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
                   jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                   pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
-                html2pdf().set(opt).from(element).save();
+                
+                html2pdf().set(opt).from(element).save().then(() => {
+                  document.getElementById('download-overlay').style.display = 'none';
+                }).catch(err => {
+                  console.error('Erro no PDF:', err);
+                  alert('Erro ao gerar PDF. Use o botão Imprimir na página.');
+                  document.getElementById('download-overlay').style.display = 'none';
+                });
               }
 
-              window.onload = () => setTimeout(startDownload, 2000);
+              if (document.readyState === 'complete') {
+                setTimeout(startDownload, 1000);
+              } else {
+                window.addEventListener('load', () => setTimeout(startDownload, 1000));
+              }
             ` }} />
           </>
         )}

@@ -170,6 +170,10 @@ export default async function PrescriptionPage({
           </div>
         </div>
         
+        {searchParams.print && (
+          <script dangerouslySetInnerHTML={{ __html: 'window.onload = () => { setTimeout(() => window.print(), 1000); }' }} />
+        )}
+
         <p className="text-center text-gray-400 text-[10px] mt-8 print:hidden">
           Esta é uma receita digital válida em todo o território nacional. Verifique a assinatura no portal do ITI.
         </p>

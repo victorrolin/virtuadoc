@@ -159,7 +159,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                   <div className="flex flex-col w-full gap-3">
                     <div className="grid grid-cols-2 gap-3">
                       <a 
-                        href={`${result.shareLink}?print=true`}
+                        href={`${result.shareLink}&print=true`}
                         target="_blank"
                         className="flex items-center justify-center gap-2 py-3.5 bg-white/5 text-white font-bold rounded-xl hover:bg-white/10 transition-all border border-white/10"
                       >

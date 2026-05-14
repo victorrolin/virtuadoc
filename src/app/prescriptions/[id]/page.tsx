@@ -38,14 +38,14 @@ export default async function PrescriptionPage({
       appointment = data
     }
 
-    // Fallbacks seguros
-    const doctor = appointment?.doctor || { 
-      full_name: manualDoctor || 'Médico Responsável', 
-      specialties: 'Medicina Digital', 
-      crm: 'Consulte o Assinador' 
+    // Fallbacks seguros - PRIORIZA o que foi digitado manualmente na URL para simulação
+    const doctor = { 
+      full_name: manualDoctor || appointment?.doctor?.full_name || 'Médico Responsável', 
+      specialties: appointment?.doctor?.specialties || 'Medicina Digital', 
+      crm: appointment?.doctor?.crm || 'Consulte o Assinador' 
     }
-    const patient = appointment?.patient || { 
-      full_name: manualPatient || 'Paciente' 
+    const patient = { 
+      full_name: manualPatient || appointment?.patient?.full_name || 'Paciente' 
     }
     const dateStr = appointment?.appointment_date || new Date().toISOString()
     

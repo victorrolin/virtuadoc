@@ -22,7 +22,7 @@ export default function PrescriptionHistoryPage() {
     setLoading(true)
     const res = await getPrescriptionHistory()
     if (res.success) {
-      setPrescriptions(res.prescriptions)
+      setPrescriptions(res.prescriptions || [])
     }
     setLoading(false)
   }

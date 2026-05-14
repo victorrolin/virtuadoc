@@ -172,22 +172,27 @@ export default async function PrescriptionPage({
         
         {searchParams.print && (
           <>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
             <script dangerouslySetInnerHTML={{ __html: `
-              window.onload = () => {
-                setTimeout(() => {
-                  const element = document.querySelector('.max-w-3xl');
-                  const opt = {
-                    margin: [15, 15, 20, 15],
-                    filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                  };
-                  html2pdf().set(opt).from(element).save();
-                }, 1500);
+              function startDownload() {
+                if (typeof html2pdf === 'undefined') {
+                  setTimeout(startDownload, 500);
+                  return;
+                }
+                
+                const element = document.querySelector('.max-w-3xl');
+                const opt = {
+                  margin: [15, 15, 20, 15],
+                  filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
+                  image: { type: 'jpeg', quality: 0.98 },
+                  html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                  pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+                html2pdf().set(opt).from(element).save();
               }
+
+              window.onload = () => setTimeout(startDownload, 2000);
             ` }} />
           </>
         )}

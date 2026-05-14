@@ -33,6 +33,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
   const [isGenerating, setIsGenerating] = useState(false)
   const [result, setResult] = useState<{ id: string, shareLink: string, whatsappLink: string } | null>(null)
   const [isSigned, setIsSigned] = useState(false)
+  const [signedUrl, setSignedUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
@@ -113,6 +114,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
       const updateRes = await uploadSignedPrescription(result.id, publicUrl)
       if (updateRes.success) {
         setIsSigned(true)
+        setSignedUrl(publicUrl)
         alert('Receita assinada anexada com sucesso!')
       } else {
         throw new Error(updateRes.error)
@@ -220,8 +222,8 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
 
                       {isSigned && result && (
                         <a 
-                          href={result.whatsappLink || `https://wa.me/?text=${encodeURIComponent(
-                            `Olá ${patientName}, aqui está sua receita digital da consulta com Dr(a). ${doctorName}: ${result.shareLink}`
+                          href={`https://wa.me/?text=${encodeURIComponent(
+                            `Olá ${patientName}, aqui está sua RECEITA DIGITAL ASSINADA da consulta com Dr(a). ${doctorName}: ${signedUrl || result.shareLink}`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"

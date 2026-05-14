@@ -166,7 +166,8 @@ export default function PrescriptionHistoryPage() {
                       
                       <button
                         onClick={() => {
-                          const text = `Olá ${p.patient_name}, aqui está sua receita digital assinada: ${p.signed_file_url || link}`
+                          const shortLink = `${window.location.origin}/r/${p.id}`
+                          const text = `Olá ${p.patient_name}, aqui está sua RECEITA DIGITAL ${p.is_signed ? 'ASSINADA' : ''} da consulta: ${shortLink}`
                           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
                         }}
                         className="flex-1 bg-primary/10 hover:bg-primary text-primary hover:text-black text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all"

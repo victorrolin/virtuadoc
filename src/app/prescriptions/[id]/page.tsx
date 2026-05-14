@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { Pill, Calendar, User, Printer, FileText, CheckCircle2 } from 'lucide-react'
+import { Pill, Calendar, User, Printer, FileText, CheckCircle2, Download } from 'lucide-react'
 
 import { PrintButton } from '@/components/PrintButton'
 
@@ -55,6 +55,16 @@ export default async function PrescriptionPage({
       appointment = data
     }
 
+    // Buscar dados extras de assinatura se existir no histórico
+    const { data: dbPrescription } = await supabase
+      .from('prescriptions')
+      .select('is_signed, signed_file_url')
+      .or(`appointment_id.eq.${id},id.eq.${id.replace('manual-', '')}`)
+      .maybeSingle()
+
+    const isSigned = dbPrescription?.is_signed || false
+    const signedUrl = dbPrescription?.signed_file_url
+
     // Fallbacks seguros - PRIORIZA o que foi digitado manualmente na URL para simulação
     const doctor = { 
       full_name: manualDoctor || appointment?.doctor?.full_name || 'Médico Responsável', 
@@ -100,6 +110,25 @@ export default async function PrescriptionPage({
             }
           }
         ` }} />
+
+        {isSigned && signedUrl && (
+          <div className="max-w-3xl mx-auto mb-6 no-print">
+            <a 
+              href={signedUrl} 
+              target="_blank" 
+              className="w-full bg-green-600 hover:bg-green-700 text-white p-6 rounded-2xl flex items-center justify-center gap-4 transition-all shadow-lg shadow-green-900/20 group"
+            >
+              <div className="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <CheckCircle2 className="h-7 w-7 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-lg leading-tight">BAIXAR RECEITA ASSINADA</p>
+                <p className="text-green-100 text-xs">Documento validado via GOV.BR / ICP-Brasil</p>
+              </div>
+              <Download className="h-6 w-6 ml-auto opacity-50" />
+            </a>
+          </div>
+        )}
 
         <div id="prescription-wrapper">
           <div id="prescription-card" className="max-w-3xl w-full mx-auto border-2 border-gray-100 p-8 sm:p-12 shadow-sm relative overflow-hidden bg-white min-h-[1050px] flex flex-col justify-between">

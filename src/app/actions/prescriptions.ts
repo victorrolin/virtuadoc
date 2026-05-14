@@ -11,12 +11,25 @@ export async function saveAndSendPrescription(data: {
   doctorName: string
 }) {
   try {
-    // 1. In a real scenario, we would save to a 'prescriptions' table
-    // For now, let's just log it and simulate success
-    console.log('Generating prescription link for:', data.patientName)
-    
-    // 2. Here we could generate a PDF and store it in Supabase Storage
-    // Or just save the JSON content
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: 'Usuário não autenticado' }
+    }
+
+    // 1. Salvar no banco de dados para consulta posterior
+    try {
+      await supabase.from('prescriptions').insert({
+        doctor_id: user.id,
+        patient_name: data.patientName,
+        medications: data.medications,
+        notes: data.notes,
+        appointment_id: data.appointmentId?.startsWith('manual') ? null : data.appointmentId
+      })
+    } catch (dbErr) {
+      console.error('Erro ao salvar no banco (certifique-se que a tabela prescriptions existe):', dbErr)
+    }
     
     // 3. Return a success message and a link for the doctor to share
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'

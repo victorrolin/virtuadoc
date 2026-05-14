@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircle, Stethoscope } from 'lucide-react'
+import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircle, Stethoscope, FileText } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import { BackButton } from '@/components/BackButton'
 import { SidebarPrescriptionButton } from '@/components/SidebarPrescriptionButton'
@@ -67,8 +67,13 @@ export default async function DashboardLayout({
                   Meu Perfil
                 </Link>
                 
-                <div className="pt-2 pb-2">
+                <div className="pt-2 pb-2 space-y-2">
                   <SidebarPrescriptionButton doctorName={profile?.full_name || 'Médico'} />
+                  
+                  <Link href="/dashboard/receitas" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
+                    <FileText className="h-5 w-5" />
+                    Histórico
+                  </Link>
                 </div>
 
                 <Link href="/dashboard/assistente" className="flex items-center gap-3 px-4 py-3 rounded-xl text-primary hover:bg-primary/10 font-bold transition-colors bg-primary/5 border border-primary/20">
@@ -90,6 +95,11 @@ export default async function DashboardLayout({
                 </Link>
               </>
             )}
+
+            <Link href="/dashboard/receitas" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
+              <FileText className="h-5 w-5" />
+              Histórico de Receitas
+            </Link>
 
             {role === 'admin' && (
               <>

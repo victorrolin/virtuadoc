@@ -60,7 +60,10 @@ export async function saveAndSendPrescription(data: {
     return { 
       success: true, 
       id: prescriptionId,
-      shareLink
+      shareLink,
+      whatsappLink: `https://wa.me/?text=${encodeURIComponent(
+        `Olá ${data.patientName}, aqui está sua receita digital da consulta com Dr(a). ${data.doctorName}: ${shareLink}`
+      )}`
     }
   } catch (error: any) {
     console.error('Error in saveAndSendPrescription:', error)

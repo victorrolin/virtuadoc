@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, X, Download, Plus, Trash2, Pill, ClipboardList, CheckCircle2, ShieldCheck, FileUp, Check, Loader2 } from 'lucide-react'
+import { FileText, Send, X, Download, Plus, Trash2, Pill, ClipboardList, CheckCircle2, ShieldCheck, FileUp, Check, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { uploadSignedPrescription } from '@/app/actions/uploadPrescription'
 
@@ -31,7 +31,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
   ])
   const [additionalNotes, setAdditionalNotes] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [result, setResult] = useState<{ id: string, shareLink: string } | null>(null)
+  const [result, setResult] = useState<{ id: string, shareLink: string, whatsappLink: string } | null>(null)
   const [isSigned, setIsSigned] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
 
@@ -73,9 +73,9 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
         doctorName
       })
       
-      if (res.success && res.shareLink) {
+      if (res.success && res.shareLink && res.whatsappLink) {
         console.log('DEBUG: Generated shareLink', res.shareLink)
-        setResult({ id: res.id, shareLink: res.shareLink })
+        setResult({ id: res.id, shareLink: res.shareLink, whatsappLink: res.whatsappLink })
       } else {
         alert(res.error || 'Erro ao gerar os links da receita.')
       }
@@ -232,7 +232,19 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                         </div>
                       )}
 
-
+                      {isSigned && result.whatsappLink && (
+                        <motion.a 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          href={result.whatsappLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full py-4 bg-[#25D366] text-black font-extrabold rounded-xl hover:bg-[#25D366]/90 transition-all shadow-lg shadow-[#25D366]/20"
+                        >
+                          <Send className="h-5 w-5" />
+                          ENVIAR PDF ASSINADO (WhatsApp)
+                        </motion.a>
+                      )}
                     </div>
                 </motion.div>
               ) : (

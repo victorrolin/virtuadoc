@@ -171,7 +171,27 @@ export default async function PrescriptionPage({
         </div>
         
         {searchParams.print && (
-          <script dangerouslySetInnerHTML={{ __html: 'window.onload = () => { setTimeout(() => window.print(), 1000); }' }} />
+          <>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+            <script dangerouslySetInnerHTML={{ __html: `
+              window.onload = () => {
+                setTimeout(() => {
+                  const element = document.querySelector('.max-w-3xl');
+                  const opt = {
+                    margin: 10,
+                    filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                  };
+                  html2pdf().set(opt).from(element).save().then(() => {
+                    // Opcional: fechar a aba após o download
+                    // window.close();
+                  });
+                }, 1500);
+              }
+            ` }} />
+          </>
         )}
 
         <p className="text-center text-gray-400 text-[10px] mt-8 print:hidden">

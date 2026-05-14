@@ -187,20 +187,29 @@ export default async function PrescriptionPage({
                 
                 const element = document.getElementById('prescription-card');
                 const opt = {
-                  margin: [15, 15, 20, 15],
+                  margin: [10, 10, 15, 10],
                   filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
-                  image: { type: 'jpeg', quality: 0.98 },
-                  html2canvas: { scale: 3, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+                  image: { type: 'jpeg', quality: 0.95 },
+                  html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    letterRendering: true,
+                    backgroundColor: '#ffffff'
+                  },
                   jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                   pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
                 
                 html2pdf().set(opt).from(element).save().then(() => {
-                  document.getElementById('download-overlay').style.display = 'none';
+                  setTimeout(() => {
+                    document.getElementById('download-overlay').style.display = 'none';
+                  }, 500);
                 }).catch(err => {
-                  console.error('Erro no PDF:', err);
-                  alert('Erro ao gerar PDF. Use o botão Imprimir na página.');
+                  console.error('Erro detalhado:', err);
                   document.getElementById('download-overlay').style.display = 'none';
+                  // Fallback para impressão do navegador se o download direto falhar
+                  window.print();
                 });
               }
 

@@ -145,8 +145,8 @@ export default async function PrescriptionPage({
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end font-sans">
+          {/* Footer - Protegido contra quebras de página */}
+          <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-end font-sans" style={{ breakInside: 'avoid' }}>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-green-600 text-xs font-bold">
                 <CheckCircle2 className="h-4 w-4" />
@@ -178,16 +178,14 @@ export default async function PrescriptionPage({
                 setTimeout(() => {
                   const element = document.querySelector('.max-w-3xl');
                   const opt = {
-                    margin: 10,
+                    margin: [15, 15, 20, 15],
                     filename: 'Receita-${patient.full_name.replace(/\s+/g, '-')}.pdf',
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                   };
-                  html2pdf().set(opt).from(element).save().then(() => {
-                    // Opcional: fechar a aba após o download
-                    // window.close();
-                  });
+                  html2pdf().set(opt).from(element).save();
                 }, 1500);
               }
             ` }} />

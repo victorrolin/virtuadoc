@@ -19,16 +19,24 @@ export async function saveAndSendPrescription(data: {
     }
 
     // 1. Salvar no banco de dados para consulta posterior
+    let prescriptionId = data.appointmentId
     try {
-      await supabase.from('prescriptions').insert({
-        doctor_id: user.id,
-        patient_name: data.patientName,
-        medications: data.medications,
-        notes: data.notes,
-        appointment_id: data.appointmentId?.startsWith('manual') ? null : data.appointmentId
-      })
+      const { data: insertedData, error: dbErr } = await supabase
+        .from('prescriptions')
+        .insert({
+          doctor_id: user.id,
+          patient_name: data.patientName,
+          medications: data.medications,
+          notes: data.notes,
+          appointment_id: data.appointmentId?.startsWith('manual') ? null : data.appointmentId
+        })
+        .select('id')
+        .single()
+      
+      if (insertedData) prescriptionId = insertedData.id
+      if (dbErr) throw dbErr
     } catch (dbErr) {
-      console.error('Erro ao salvar no banco (certifique-se que a tabela prescriptions existe):', dbErr)
+      console.error('Erro ao salvar no banco:', dbErr)
     }
     
     // 3. Return a success message and a link for the doctor to share
@@ -51,10 +59,8 @@ export async function saveAndSendPrescription(data: {
     
     return { 
       success: true, 
-      shareLink,
-      whatsappLink: `https://wa.me/?text=${encodeURIComponent(
-        `Olá ${data.patientName}, aqui está sua receita digital da consulta com Dr(a). ${data.doctorName}: ${shareLink}`
-      )}`
+      id: prescriptionId,
+      shareLink
     }
   } catch (error: any) {
     console.error('Error in saveAndSendPrescription:', error)

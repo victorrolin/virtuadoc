@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, Send, X, Download, Plus, Trash2, Pill, ClipboardList, CheckCircle2, ShieldCheck } from 'lucide-react'
+import { FileText, X, Download, Plus, Trash2, Pill, ClipboardList, CheckCircle2, ShieldCheck, FileUp, Check, Loader2 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { uploadSignedPrescription } from '@/app/actions/uploadPrescription'
 
 import { saveAndSendPrescription } from '@/app/actions/prescriptions'
 import { MemedPrescriber } from './MemedPrescriber'
@@ -29,7 +31,9 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
   ])
   const [additionalNotes, setAdditionalNotes] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [result, setResult] = useState<{ shareLink: string, whatsappLink: string } | null>(null)
+  const [result, setResult] = useState<{ id: string, shareLink: string } | null>(null)
+  const [isSigned, setIsSigned] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
     if (initialPatientName) setPatientName(initialPatientName)
@@ -69,9 +73,9 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
         doctorName
       })
       
-      if (res.success && res.shareLink && res.whatsappLink) {
+      if (res.success && res.shareLink) {
         console.log('DEBUG: Generated shareLink', res.shareLink)
-        setResult({ shareLink: res.shareLink, whatsappLink: res.whatsappLink })
+        setResult({ id: res.id, shareLink: res.shareLink })
       } else {
         alert(res.error || 'Erro ao gerar os links da receita.')
       }
@@ -80,6 +84,39 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
       alert('Erro ao gerar receita.')
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !result) return
+
+    setIsUploading(true)
+    try {
+      const supabase = createClient()
+      const fileName = `${result.id}_signed.pdf`
+      
+      const { data, error: uploadError } = await supabase.storage
+        .from('prescriptions')
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('prescriptions')
+        .getPublicUrl(fileName)
+
+      const updateRes = await uploadSignedPrescription(result.id, publicUrl)
+      if (updateRes.success) {
+        setIsSigned(true)
+        alert('Receita assinada anexada com sucesso!')
+      } else {
+        throw new Error(updateRes.error)
+      }
+    } catch (error: any) {
+      alert('Erro no upload: ' + error.message)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -157,35 +194,46 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                     </p>
                   </div>
 
-                  <div className="flex flex-col w-full gap-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <a 
-                        href={`${result.shareLink}&print=true`}
-                        target="_blank"
-                        className="flex items-center justify-center gap-2 py-3.5 bg-white/5 text-white font-bold rounded-xl hover:bg-white/10 transition-all border border-white/10"
-                      >
-                        <Download className="h-5 w-5" />
-                        Baixar PDF
-                      </a>
-                      <a 
-                        href="https://assinador.iti.br"
-                        target="_blank"
-                        className="flex items-center justify-center gap-2 py-3.5 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-all border border-primary/20"
-                      >
-                        <ShieldCheck className="h-5 w-5" />
-                        Assinar (ITI)
-                      </a>
+                    <div className="flex flex-col w-full gap-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <a 
+                          href={`${result.shareLink}&print=true`}
+                          target="_blank"
+                          className="flex items-center justify-center gap-2 py-3.5 bg-white/5 text-white font-bold rounded-xl hover:bg-white/10 transition-all border border-white/10"
+                        >
+                          <Download className="h-5 w-5" />
+                          Baixar PDF
+                        </a>
+                        <a 
+                          href="https://assinador.iti.br"
+                          target="_blank"
+                          className="flex items-center justify-center gap-2 py-3.5 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-all border border-primary/20"
+                        >
+                          <ShieldCheck className="h-5 w-5" />
+                          Assinar (ITI)
+                        </a>
+                      </div>
+
+                      {/* Botão de Upload Direto */}
+                      {!isSigned ? (
+                        <label className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 border-2 border-dashed border-white/10 text-gray-400 font-bold rounded-xl hover:bg-white/10 hover:border-primary/30 transition-all cursor-pointer group">
+                          {isUploading ? (
+                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          ) : (
+                            <FileUp className="h-5 w-5 group-hover:text-primary" />
+                          )}
+                          <span>{isUploading ? 'Enviando...' : 'Anexar PDF Assinado (Gov.br)'}</span>
+                          <input type="file" accept=".pdf" className="hidden" onChange={handleUpload} disabled={isUploading} />
+                        </label>
+                      ) : (
+                        <div className="flex items-center justify-center gap-3 w-full py-4 bg-green-500/10 border border-green-500/30 text-green-500 font-bold rounded-xl">
+                          <Check className="h-5 w-5" />
+                          <span>Receita Assinada Anexada!</span>
+                        </div>
+                      )}
+
+
                     </div>
-                    <a 
-                      href={result.whatsappLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-4 bg-[#25D366] text-black font-extrabold rounded-xl hover:bg-[#25D366]/90 transition-all shadow-[0_0_20px_rgba(37,211,102,0.2)]"
-                    >
-                      <Send className="h-5 w-5" />
-                      Enviar PDF Assinado via WhatsApp
-                    </a>
-                  </div>
                 </motion.div>
               ) : (
                 <>

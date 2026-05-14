@@ -69,8 +69,10 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
         doctorName
       })
       
-      if (res.success) {
+      if (res.success && res.shareLink && res.whatsappLink) {
         setResult({ shareLink: res.shareLink, whatsappLink: res.whatsappLink })
+      } else {
+        alert(res.error || 'Erro ao gerar os links da receita.')
       }
     } catch (error) {
       console.error(error)

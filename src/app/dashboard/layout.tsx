@@ -72,7 +72,7 @@ export default async function DashboardLayout({
                   
                   <Link href="/dashboard/receitas" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
                     <FileText className="h-5 w-5" />
-                    Histórico
+                    Histórico de Receitas
                   </Link>
                 </div>
 
@@ -95,11 +95,6 @@ export default async function DashboardLayout({
                 </Link>
               </>
             )}
-
-            <Link href="/dashboard/receitas" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
-              <FileText className="h-5 w-5" />
-              Histórico de Receitas
-            </Link>
 
             {role === 'admin' && (
               <>

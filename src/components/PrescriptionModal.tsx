@@ -218,7 +218,21 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                         </a>
                       </div>
 
-                      {/* Botão de Upload Direto */}
+                      {isSigned && result && (
+                        <a 
+                          href={result.whatsappLink || `https://wa.me/?text=${encodeURIComponent(
+                            `Olá ${patientName}, aqui está sua receita digital da consulta com Dr(a). ${doctorName}: ${result.shareLink}`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full py-4 bg-[#25D366] text-black font-extrabold rounded-xl hover:bg-[#25D366]/90 transition-all shadow-lg shadow-[#25D366]/20"
+                        >
+                          <Send className="h-5 w-5" />
+                          ENVIAR VIA WHATSAPP
+                        </a>
+                      )}
+
+                      {/* Botão de Upload ou Status */}
                       {!isSigned ? (
                         <label className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 border-2 border-dashed border-white/10 text-gray-400 font-bold rounded-xl hover:bg-white/10 hover:border-primary/30 transition-all cursor-pointer group">
                           {isUploading ? (
@@ -234,20 +248,6 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                           <Check className="h-5 w-5" />
                           <span>Receita Assinada Anexada!</span>
                         </div>
-                      )}
-
-                      {isSigned && result && (
-                        <a 
-                          href={result.whatsappLink || `https://wa.me/?text=${encodeURIComponent(
-                            `Olá ${patientName}, aqui está sua receita digital da consulta com Dr(a). ${doctorName}: ${result.shareLink}`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full py-4 bg-[#25D366] text-black font-extrabold rounded-xl hover:bg-[#25D366]/90 transition-all shadow-lg shadow-[#25D366]/20"
-                        >
-                          <Send className="h-5 w-5" />
-                          ENVIAR PDF ASSINADO (WhatsApp)
-                        </a>
                       )}
                     </div>
                 </motion.div>

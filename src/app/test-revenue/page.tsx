@@ -13,8 +13,8 @@ export default async function TestRevenuePage() {
 
   const { data: allAppts } = await supabase
     .from('appointments')
-    .select('*')
-    .limit(10)
+    .select('id, doctor_id, status, appointment_date')
+    .limit(50)
 
   return (
     <div className="p-10 text-white bg-black min-h-screen">

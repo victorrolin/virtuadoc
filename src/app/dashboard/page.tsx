@@ -59,11 +59,15 @@ export default async function DashboardPage() {
     const now = new Date()
     const firstDayOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
 
-    const { data: earningsData } = await supabase
+    const { data: earningsData, error: earningsError } = await supabase
       .from('appointments')
-      .select('id, amount_paid')
+      .select('id, amount_paid, status, doctor_id')
       .eq('doctor_id', user!.id)
       .in('status', ['paid', 'completed'])
+
+    if (earningsError) {
+      console.error('Erro ao buscar faturamento:', earningsError)
+    }
 
     earningsCount = earningsData?.length || 0
 

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Calendar, Users, Video, Clock, ArrowRight, Activity, Edit3, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { DashboardPrescriptionButton } from '@/components/DashboardPrescriptionButton'
+import { CountdownTimer } from '@/components/CountdownTimer'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -151,24 +152,24 @@ export default async function DashboardPage() {
           {nextAppointments.length > 0 && (
             <div className="bg-gradient-to-r from-primary/20 to-secondary/20 rounded-3xl p-1 shadow-xl animate-fade-in">
               <div className="bg-[#0a0a0a] rounded-[1.4rem] p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4">
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full text-[10px] font-bold text-green-400 uppercase tracking-wider animate-pulse">
-                    <span className="h-2 w-2 rounded-full bg-green-500"></span> Agora
-                  </div>
-                </div>
-                
                 <h3 className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
                   <Video className="h-4 w-4" /> Próximo Atendimento
                 </h3>
-                
+
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="flex items-center gap-5">
                     <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-black border border-primary/20">
                       {nextAppointments[0].patient?.full_name?.charAt(0)}
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-white">{nextAppointments[0].patient?.full_name}</p>
-                      <p className="text-primary font-medium flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <p className="text-2xl font-bold text-white">{nextAppointments[0].patient?.full_name}</p>
+                        <CountdownTimer 
+                          targetDate={nextAppointments[0].appointment_date} 
+                          targetTime={nextAppointments[0].start_time} 
+                        />
+                      </div>
+                      <p className="text-primary font-medium flex items-center gap-2">
                         <Clock className="h-4 w-4" /> {formatDate(nextAppointments[0].appointment_date, nextAppointments[0].start_time)}
                       </p>
                     </div>

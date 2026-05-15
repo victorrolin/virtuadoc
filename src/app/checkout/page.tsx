@@ -16,7 +16,7 @@ function CheckoutContent() {
   const specialty = searchParams.get('specialty') || ''
   const price = searchParams.get('price') || '0'
 
-  const [step, setStep] = useState<'info' | 'payment' | 'confirmed'>('info')
+  const [step, setStep] = useState<'info' | 'review' | 'payment' | 'confirmed'>('info')
   const [loading, setLoading] = useState(false)
   const [appointmentId, setAppointmentId] = useState('')
   const [meetLink, setMeetLink] = useState('')
@@ -31,6 +31,11 @@ function CheckoutContent() {
   }
 
   async function handleInfoSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setStep('review')
+  }
+
+  async function handleReviewSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStep('payment')
   }
@@ -113,15 +118,23 @@ function CheckoutContent() {
       {/* Progress */}
       <div className="max-w-5xl mx-auto px-4 pt-8 pb-4">
         <div className="flex items-center gap-2 mb-8">
-          {['Seus Dados', 'Pagamento'].map((s, i) => (
+          {['Dados', 'Revisão', 'Pagamento'].map((s, i) => (
             <div key={s} className="flex items-center gap-2 flex-1">
-              <div className={`flex items-center gap-2 text-sm font-medium ${i === 0 && step === 'info' ? 'text-primary' : i === 1 && step === 'payment' ? 'text-primary' : 'text-gray-500'}`}>
-                <span className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${(i === 0 && step === 'info') || (i === 1 && step === 'payment') ? 'bg-primary text-black font-bold' : step === 'payment' && i === 0 ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-gray-500'}`}>
-                  {step === 'payment' && i === 0 ? '✓' : i + 1}
+              <div className={`flex items-center gap-2 text-sm font-medium ${
+                (i === 0 && step === 'info') || 
+                (i === 1 && step === 'review') || 
+                (i === 2 && step === 'payment') ? 'text-primary' : 'text-gray-500'
+              }`}>
+                <span className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] ${
+                  ((i === 0 && step === 'info') || (i === 1 && step === 'review') || (i === 2 && step === 'payment')) 
+                    ? 'bg-primary text-black font-bold' 
+                    : (step === 'payment' || (step === 'review' && i === 0)) ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-gray-500'
+                }`}>
+                  {(step === 'payment' && i < 2) || (step === 'review' && i === 0) ? '✓' : i + 1}
                 </span>
                 {s}
               </div>
-              {i < 1 && <div className={`flex-1 h-px ${step === 'payment' ? 'bg-primary/30' : 'bg-white/10'}`} />}
+              {i < 2 && <div className={`flex-1 h-px ${(step === 'payment' || (step === 'review' && i === 0)) ? 'bg-primary/30' : 'bg-white/10'}`} />}
             </div>
           ))}
         </div>
@@ -225,6 +238,46 @@ function CheckoutContent() {
                   className="w-full bg-gradient-to-r from-primary to-cyan-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-[0_0_20px_rgba(0,242,254,0.2)]">
                   Continuar para Pagamento <ArrowLeft className="h-4 w-4 rotate-180" />
                 </button>
+              </form>
+            )}
+
+            {step === 'review' && (
+              <form onSubmit={handleReviewSubmit} className="glass rounded-2xl p-8 border border-white/5 animate-fade-in">
+                <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" /> Confirme seus Dados
+                </h2>
+                <p className="text-gray-400 text-sm mb-8">Verifique se as informações abaixo estão corretas para garantir o recebimento do link da consulta.</p>
+                
+                <div className="space-y-4 mb-10">
+                  {[
+                    { label: 'Paciente', value: form.name, icon: User },
+                    { label: 'E-mail para link', value: form.email, icon: Mail },
+                    { label: 'WhatsApp', value: form.phone, icon: Phone },
+                    { label: 'CPF', value: form.cpf, icon: CheckCircle2 },
+                    { label: 'Motivo', value: form.reason, icon: Activity },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-start gap-4 p-4 bg-white/5 rounded-xl border border-white/5">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-widest font-black text-gray-500 mb-0.5">{item.label}</p>
+                        <p className="text-white font-medium">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-3">
+                  <button type="button" onClick={() => setStep('info')}
+                    className="flex-1 border border-white/10 text-gray-400 hover:text-white font-semibold py-4 rounded-xl transition-all">
+                    Corrigir Dados
+                  </button>
+                  <button type="submit"
+                    className="flex-2 flex-[2] bg-gradient-to-r from-primary to-cyan-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-[0_0_20px_rgba(0,242,254,0.2)]">
+                    Tudo Correto, Pagar <ArrowLeft className="h-4 w-4 rotate-180" />
+                  </button>
+                </div>
               </form>
             )}
 

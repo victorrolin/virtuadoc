@@ -91,16 +91,34 @@ export default async function DoctorProfilePage({
                     <p className="text-sm text-gray-400">{day.dayName}</p>
                   </div>
                   
-                  <div className="flex flex-wrap gap-3">
-                    {day.slots.map((time) => (
-                      <Link 
-                        key={time} 
-                        href={`/checkout?doctor=${doctor.id}&date=${day.date}&time=${time}&name=${encodeURIComponent(doctor.full_name)}&specialty=${encodeURIComponent(doctor.specialties || '')}&price=${doctor.price_per_consultation || 0}`}
-                        className="bg-white/5 hover:bg-primary hover:text-black border border-white/10 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
-                      >
-                        {time}
-                      </Link>
-                    ))}
+                  <div className="space-y-6">
+                    {[
+                      { label: 'Manhã', icon: '🌅', filter: (t: string) => t < '12:00' },
+                      { label: 'Tarde', icon: '☀️', filter: (t: string) => t >= '12:00' && t < '18:00' },
+                      { label: 'Noite', icon: '🌙', filter: (t: string) => t >= '18:00' }
+                    ].map((period) => {
+                      const periodSlots = day.slots.filter(period.filter)
+                      if (periodSlots.length === 0) return null
+                      
+                      return (
+                        <div key={period.label}>
+                          <p className="text-[10px] uppercase tracking-widest font-black text-gray-500 mb-3 flex items-center gap-2">
+                            <span>{period.icon}</span> {period.label}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {periodSlots.map((time) => (
+                              <Link 
+                                key={time} 
+                                href={`/checkout?doctor=${doctor.id}&date=${day.date}&time=${time}&name=${encodeURIComponent(doctor.full_name)}&specialty=${encodeURIComponent(doctor.specialties || '')}&price=${doctor.price_per_consultation || 0}`}
+                                className="bg-white/5 hover:bg-primary hover:text-black border border-white/10 text-white px-3 py-2 rounded-xl text-xs font-bold transition-all min-w-[70px] text-center"
+                              >
+                                {time}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               ))}

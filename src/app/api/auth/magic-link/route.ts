@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
             </table>
 
             <div style="background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;padding:16px;margin-bottom:20px;">
-              <p style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;margin:0 0 6px;">Ou copie o link abaixo:</p>
-              <p style="color:#00f2fe;font-size:12px;word-break:break-all;margin:0;">${magicLink}</p>
+              <p style="color:#666;font-size:11px;text-transform:uppercase;font-weight:700;margin:0 0 6px;">Se o botão acima não funcionar, clique no link abaixo:</p>
+              <a href="${magicLink}" style="color:#00f2fe;font-size:12px;word-break:break-all;margin:0;text-decoration:underline;">${magicLink}</a>
             </div>
 
             <div style="background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;padding:16px;">

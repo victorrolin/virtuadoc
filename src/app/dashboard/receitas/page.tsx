@@ -105,22 +105,22 @@ export default function PrescriptionHistoryPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
             <FileText className="h-6 text-primary" />
             Histórico de Receitas
           </h1>
-          <p className="text-gray-400 text-sm">Consulte e reenvie receitas geradas anteriormente.</p>
+          <p className="text-gray-400 text-xs md:text-sm">Consulte e reenvie receitas geradas anteriormente.</p>
         </div>
 
-        <div className="relative max-w-sm w-full">
+        <div className="relative w-full md:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           <input
             type="text"
             placeholder="Buscar por paciente..."
-            className="w-full pl-10 pr-4 py-2 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="w-full pl-10 pr-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

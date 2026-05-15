@@ -5,6 +5,8 @@ import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircl
 import { signOut } from '@/app/actions/auth'
 import { BackButton } from '@/components/BackButton'
 import { SidebarPrescriptionButton } from '@/components/SidebarPrescriptionButton'
+import { MobileNav } from '@/components/MobileNav'
+import { MobileFAB } from '@/components/MobileFAB'
 
 export default async function DashboardLayout({
   children,
@@ -32,8 +34,8 @@ export default async function DashboardLayout({
   const firstName = profile?.full_name?.split(' ')[0] || 'Usuário'
 
   return (
-    <div className="min-h-screen flex bg-[#050505]">
-      {/* Sidebar */}
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#050505]">
+      {/* Sidebar Desktop */}
       <aside className="w-64 border-r border-white/5 bg-black/40 hidden md:flex flex-col">
         <div className="h-20 flex items-center px-6 border-b border-white/5">
           <Link href="/" className="flex items-center gap-2">
@@ -127,19 +129,19 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
+      {/* Header Mobile */}
+      <MobileNav role={role} firstName={firstName} signOut={signOut} />
+
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 md:hidden">
-          <Activity className="h-6 w-6 text-primary" />
-          <form action={signOut}>
-            <button className="text-sm text-red-400 font-medium">Sair</button>
-          </form>
-        </header>
-        <div className="p-8">
+      <main className="flex-1 flex flex-col md:h-screen md:overflow-y-auto">
+        <div className="p-4 md:p-8 pb-20 md:pb-8">
           <BackButton />
           {children}
         </div>
       </main>
+
+      {/* FAB Mobile for Doctors */}
+      {role === 'doctor' && <MobileFAB doctorName={profile?.full_name || 'Médico'} />}
     </div>
   )
 }

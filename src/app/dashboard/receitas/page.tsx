@@ -7,8 +7,10 @@ import { deletePrescription } from '@/app/actions/deletePrescription'
 import { createClient } from '@/lib/supabase/client'
 import { FileText, Search, Send, Download, Loader2, Calendar, User, CheckCircle2, Upload, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useToast } from '@/components/Toast'
 
 export default function PrescriptionHistoryPage() {
+  const { toast } = useToast()
   const [prescriptions, setPrescriptions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [uploadingId, setUploadingId] = useState<string | null>(null)
@@ -58,14 +60,14 @@ export default function PrescriptionHistoryPage() {
       const res = await uploadSignedPrescription(selectedId, publicUrl)
       
       if (res.success) {
-        alert('Receita assinada enviada com sucesso!')
+        toast('Receita assinada enviada com sucesso!', 'success')
         load()
       } else {
-        alert('Erro ao atualizar banco: ' + res.error)
+        toast('Erro ao atualizar banco: ' + res.error, 'error')
       }
     } catch (err: any) {
       console.error('Upload error:', err)
-      alert('Erro no upload: ' + err.message)
+      toast('Erro no upload: ' + err.message, 'error')
     } finally {
       setUploadingId(null)
       setSelectedId(null)
@@ -78,13 +80,14 @@ export default function PrescriptionHistoryPage() {
     try {
       const res = await deletePrescription(id)
       if (res.success) {
+        toast('Receita excluída do histórico.', 'success')
         load()
       } else {
-        alert('Erro ao excluir: ' + res.error)
+        toast('Erro ao excluir: ' + res.error, 'error')
       }
     } catch (err) {
       console.error(err)
-      alert('Erro ao excluir receita.')
+      toast('Erro ao excluir receita.', 'error')
     }
   }
 

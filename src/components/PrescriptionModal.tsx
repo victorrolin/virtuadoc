@@ -4,15 +4,14 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FileText, Send, X, Download, Plus, Trash2, Pill, ClipboardList, CheckCircle2, ShieldCheck, FileUp, Check, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { uploadSignedPrescription } from '@/app/actions/uploadPrescription'
-
-import { saveAndSendPrescription } from '@/app/actions/prescriptions'
+import { saveAndSendPrescription, uploadSignedPrescription } from '@/app/actions/prescriptions'
+import { useToast } from '@/components/Toast'
 import { MemedPrescriber } from './MemedPrescriber'
 
 interface PrescriptionModalProps {
   isOpen: boolean
   onClose: () => void
-  appointmentId: string
+  appointmentId?: string
   patientName: string
   doctorName: string
 }
@@ -25,6 +24,7 @@ interface Medication {
 }
 
 export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName: initialPatientName, doctorName }: PrescriptionModalProps) {
+  const { toast } = useToast()
   const [patientName, setPatientName] = useState(initialPatientName || '')
   const [medications, setMedications] = useState<Medication[]>([
     { id: '1', name: '', dosage: '', instructions: '' }
@@ -81,12 +81,13 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
           shareLink: res.shareLink, 
           whatsappLink: res.whatsappLink || '' 
         })
+        toast('Receita gerada com sucesso!', 'success')
       } else {
-        alert(res.error || 'Erro ao gerar os links da receita.')
+        toast(res.error || 'Erro ao gerar os links da receita.', 'error')
       }
     } catch (error) {
       console.error(error)
-      alert('Erro ao gerar receita.')
+      toast('Erro ao gerar receita.', 'error')
     } finally {
       setIsGenerating(false)
     }
@@ -115,12 +116,12 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
       if (updateRes.success) {
         setIsSigned(true)
         setSignedUrl(publicUrl)
-        alert('Receita assinada anexada com sucesso!')
+        toast('Receita assinada anexada com sucesso!', 'success')
       } else {
         throw new Error(updateRes.error)
       }
     } catch (error: any) {
-      alert('Erro no upload: ' + error.message)
+      toast('Erro no upload: ' + error.message, 'error')
     } finally {
       setIsUploading(false)
     }

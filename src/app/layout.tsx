@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "Consulte os melhores especialistas do Brasil por videochamada. Agende sua teleconsulta com segurança e praticidade.",
 };
 
+import { ToastProvider } from '@/components/Toast'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,10 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#050505]">
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+      </body>
     </html>
   );
 }

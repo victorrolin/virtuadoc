@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Video, Calendar, Clock, User, ExternalLink, ArrowRight } from 'lucide-react'
+import { Video, Calendar, Clock, User, ExternalLink, ArrowRight, FileText, Download, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { MeetLinkButton } from '@/components/MeetLinkButton'
+import { getPatientPrescriptions } from '@/app/actions/prescriptions'
 
 export default async function MinhasConsultasPage() {
   const supabase = await createClient()
@@ -42,9 +43,16 @@ export default async function MinhasConsultasPage() {
     .order('appointment_date', { ascending: false })
     .limit(10)
 
+  const { prescriptions } = await getPatientPrescriptions()
+
   function formatDate(dateStr: string) {
     const d = new Date(dateStr + 'T00:00:00')
     return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+  }
+
+  function formatSimpleDate(dateStr: string) {
+    const d = new Date(dateStr)
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
   }
 
   function isNow(dateStr: string, startTime: string) {
@@ -125,6 +133,56 @@ export default async function MinhasConsultasPage() {
                         <MeetLinkButton link={meetLink} />
                       </div>
                     </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Receitas Digitais */}
+      <div className="glass p-6 rounded-2xl">
+        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <FileText className="h-5 w-5 text-primary" /> Minhas Receitas Digitais
+        </h2>
+
+        {!prescriptions || prescriptions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center border border-dashed border-white/10 rounded-xl">
+            <p className="text-gray-500 text-sm italic">Você ainda não possui receitas digitais emitidas.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {prescriptions.map((p: any) => {
+              const shortLink = `/r/${p.id}.pdf`
+              
+              return (
+                <div key={p.id} className="p-4 bg-white/5 border border-white/5 rounded-xl hover:border-primary/20 transition-all group">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    {p.is_signed && (
+                      <span className="flex items-center gap-1 text-[9px] font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        <ShieldCheck className="h-3 w-3" /> Assinada
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="mb-4">
+                    <p className="text-white font-semibold truncate">Receita Médica</p>
+                    <p className="text-xs text-gray-500">Emitida em {formatSimpleDate(p.created_at)}</p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Link 
+                      href={p.is_signed ? shortLink : `/prescriptions/${p.id}`}
+                      target="_blank"
+                      className="flex-1 flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-black font-bold py-2 rounded-lg text-xs transition-all"
+                    >
+                      {p.is_signed ? <ShieldCheck className="h-3.5 w-3.5" /> : <ExternalLink className="h-3.5 w-3.5" />}
+                      {p.is_signed ? 'Ver Assinada' : 'Visualizar'}
+                    </Link>
                   </div>
                 </div>
               )

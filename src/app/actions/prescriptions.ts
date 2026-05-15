@@ -70,3 +70,29 @@ export async function saveAndSendPrescription(data: {
     return { success: false, error: error?.message || 'Erro interno na geração da receita.' }
   }
 }
+
+export async function getPatientPrescriptions() {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) throw new Error('Não autenticado')
+
+    // Buscar receitas vinculadas aos agendamentos do paciente
+    const { data, error } = await supabase
+      .from('prescriptions')
+      .select(`
+        *,
+        appointment:appointments!inner(patient_id)
+      `)
+      .eq('appointment.patient_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    return { success: true, prescriptions: data || [] }
+  } catch (error: any) {
+    console.error('Error fetching patient prescriptions:', error)
+    return { success: false, error: error.message }
+  }
+}

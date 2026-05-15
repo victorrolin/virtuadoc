@@ -64,6 +64,8 @@ export default async function DashboardPage() {
       .eq('doctor_id', user!.id)
       .in('status', ['paid', 'completed'])
 
+    const earningsCount = earningsData?.length || 0
+
     // Cálculo de faturamento (usando amount_paid ou o preço do perfil como fallback)
     const defaultPrice = Number(profile?.price_per_consultation) || 150
     completedTotal = earningsData?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || defaultPrice), 0) || 0
@@ -141,11 +143,16 @@ export default async function DashboardPage() {
             <div className="text-2xl font-bold text-white mb-4">
               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(completedTotal)}
             </div>
-            <div className="pt-4 border-t border-white/5">
-              <p className="text-[10px] text-gray-500 uppercase font-black mb-0.5">Seu Recebimento (80%)</p>
-              <p className="text-xl font-bold text-green-400">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(completedTotal * 0.8)}
-              </p>
+            <div className="pt-4 border-t border-white/5 flex justify-between items-end">
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase font-black mb-0.5">Seu Recebimento (80%)</p>
+                <p className="text-xl font-bold text-green-400">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(completedTotal * 0.8)}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-[9px] text-gray-600 font-bold uppercase">{earningsCount} consultas</p>
+              </div>
             </div>
           </div>
         )}

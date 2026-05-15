@@ -19,23 +19,28 @@ export async function GET(
     // Usar Service Client para ignorar RLS e encontrar a receita para o paciente (que não está logado)
     const supabase = createServiceClient()
     
-    // Buscar os dados frescos do banco sem cache
     const { data, error } = await supabase
       .from('prescriptions')
       .select('signed_file_url, is_signed')
       .or(`id.eq.${id},appointment_id.eq.${id}`)
       .maybeSingle()
 
-    if (error) {
-      console.error('Database error in redirect:', error)
-    }
-
     if (data?.is_signed && data?.signed_file_url) {
-      // Retornar um redirecionamento 302 (temporário) com headers de no-cache
-      return new Response(null, {
-        status: 302,
+      // PROXY: Em vez de redirecionar (que pode falhar em iPhones/Safari), 
+      // buscamos o PDF e servimos diretamente do nosso domínio.
+      const pdfResponse = await fetch(data.signed_file_url)
+      
+      if (!pdfResponse.ok) {
+        throw new Error('Falha ao buscar o PDF original')
+      }
+
+      const pdfBuffer = await pdfResponse.arrayBuffer()
+
+      return new Response(pdfBuffer, {
+        status: 200,
         headers: {
-          'Location': data.signed_file_url,
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'inline; filename="receita-digital.pdf"',
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           'Pragma': 'no-cache',
           'Expires': '0',
@@ -47,7 +52,7 @@ export async function GET(
     const baseUrl = new URL(request.url).origin
     return redirect(`${baseUrl}/prescriptions/${id}`)
   } catch (error) {
-    console.error('Redirect error:', error)
+    console.error('Redirect/Proxy error:', error)
     return redirect('/')
   }
 }

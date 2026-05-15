@@ -223,7 +223,7 @@ export function PrescriptionModal({ isOpen, onClose, appointmentId, patientName:
                       {isSigned && result && (
                         <a 
                           href={`https://wa.me/?text=${encodeURIComponent(
-                            `Olá ${patientName}, aqui está sua RECEITA DIGITAL ASSINADA da consulta com Dr(a). ${doctorName}: ${window.location.origin}/r/${result.id}?v=${Date.now()}`
+                            `Olá ${patientName}, aqui está sua RECEITA DIGITAL ASSINADA da consulta com Dr(a). ${doctorName}: ${window.location.origin}/r/${result.id}.pdf?v=${Date.now()}`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"

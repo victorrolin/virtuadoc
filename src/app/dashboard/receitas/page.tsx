@@ -189,7 +189,7 @@ export default function PrescriptionHistoryPage() {
                       
                       <button
                         onClick={() => {
-                          const shortLink = `${window.location.origin}/r/${p.id}?v=${Date.now()}`
+                          const shortLink = `${window.location.origin}/r/${p.id}.pdf?v=${Date.now()}`
                           const text = `Olá ${p.patient_name}, aqui está sua RECEITA DIGITAL ${p.is_signed ? 'ASSINADA' : ''} da consulta: ${shortLink}`
                           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
                         }}

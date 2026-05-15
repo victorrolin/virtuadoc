@@ -62,7 +62,7 @@ export async function saveAndSendPrescription(data: {
       id: prescriptionId,
       shareLink,
       whatsappLink: `https://wa.me/?text=${encodeURIComponent(
-        `Olá ${data.patientName}, aqui está sua receita digital da consulta com Dr(a). ${data.doctorName}: ${baseUrl}/r/${prescriptionId}`
+        `Olá ${data.patientName}, aqui está sua receita digital da consulta com Dr(a). ${data.doctorName}: ${baseUrl}/r/${prescriptionId}.pdf`
       )}`
     }
   } catch (error: any) {

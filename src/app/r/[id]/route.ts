@@ -8,7 +8,12 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params
+  let { id } = await params
+  
+  // Remover .pdf se estiver presente para buscar no banco apenas pelo ID original
+  if (id.endsWith('.pdf')) {
+    id = id.replace('.pdf', '')
+  }
 
   try {
     const supabase = await createClient()

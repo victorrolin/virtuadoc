@@ -55,18 +55,17 @@ export default async function DashboardPage() {
 
     nextAppointments = upcoming || []
 
-    const { data: completedAppts, count } = await supabase
-      .from('appointments')
-      .select('id, amount_paid', { count: 'exact' })
-      .eq('doctor_id', user!.id)
-      .eq('status', 'completed')
+    const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]
 
-    completedTotal = count || 0
-    
+    const { data: earningsData } = await supabase
+      .from('appointments')
+      .select('id, amount_paid')
+      .eq('doctor_id', user!.id)
+      .in('status', ['paid', 'completed'])
+      .gte('appointment_date', firstDayOfMonth)
+
     // Cálculo de faturamento (usando amount_paid ou o preço do perfil como fallback)
-    const monthlyEarnings = completedAppts?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || Number(profile?.price_per_consultation) || 0), 0) || 0
-    
-    completedTotal = monthlyEarnings // Vou usar essa variável para o faturamento para simplificar o diff
+    completedTotal = earningsData?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || Number(profile?.price_per_consultation) || 0), 0) || 0
   }
 
   function formatDate(dateStr: string, time: string) {

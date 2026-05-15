@@ -61,7 +61,7 @@ export default async function DashboardPage() {
 
     const { data: earningsData, error: earningsError } = await supabase
       .from('appointments')
-      .select('id, amount_paid, status, doctor_id')
+      .select('id, status, doctor_id')
       .eq('doctor_id', user!.id)
       .in('status', ['paid', 'completed'])
 
@@ -71,9 +71,9 @@ export default async function DashboardPage() {
 
     earningsCount = earningsData?.length || 0
 
-    // Cálculo de faturamento (usando amount_paid ou o preço do perfil como fallback)
+    // Cálculo de faturamento (usando o preço do perfil como fallback)
     const defaultPrice = Number(profile?.price_per_consultation) || 150
-    completedTotal = earningsData?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || defaultPrice), 0) || 0
+    completedTotal = earningsData?.reduce((acc) => acc + defaultPrice, 0) || 0
   }
 
   function formatDate(dateStr: string, time: string) {

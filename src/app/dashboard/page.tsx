@@ -63,7 +63,6 @@ export default async function DashboardPage() {
       .select('id, amount_paid')
       .eq('doctor_id', user!.id)
       .in('status', ['paid', 'completed'])
-      .gte('appointment_date', firstDayOfMonth)
 
     // Cálculo de faturamento (usando amount_paid ou o preço do perfil como fallback)
     const defaultPrice = Number(profile?.price_per_consultation) || 150

@@ -55,7 +55,8 @@ export default async function DashboardPage() {
 
     nextAppointments = upcoming || []
 
-    const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]
+    const now = new Date()
+    const firstDayOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
 
     const { data: earningsData } = await supabase
       .from('appointments')
@@ -65,7 +66,8 @@ export default async function DashboardPage() {
       .gte('appointment_date', firstDayOfMonth)
 
     // Cálculo de faturamento (usando amount_paid ou o preço do perfil como fallback)
-    completedTotal = earningsData?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || Number(profile?.price_per_consultation) || 0), 0) || 0
+    const defaultPrice = Number(profile?.price_per_consultation) || 150
+    completedTotal = earningsData?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || defaultPrice), 0) || 0
   }
 
   function formatDate(dateStr: string, time: string) {

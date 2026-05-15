@@ -24,6 +24,7 @@ export default async function DashboardPage() {
   let todayCount = 0
   let nextAppointments: any[] = []
   let completedTotal = 0
+  let earningsCount = 0
 
   if (isDoctor) {
     const { data: todayAppts } = await supabase
@@ -64,7 +65,7 @@ export default async function DashboardPage() {
       .eq('doctor_id', user!.id)
       .in('status', ['paid', 'completed'])
 
-    const earningsCount = earningsData?.length || 0
+    earningsCount = earningsData?.length || 0
 
     // Cálculo de faturamento (usando amount_paid ou o preço do perfil como fallback)
     const defaultPrice = Number(profile?.price_per_consultation) || 150

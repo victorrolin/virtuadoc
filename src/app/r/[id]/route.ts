@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
@@ -16,7 +16,8 @@ export async function GET(
   }
 
   try {
-    const supabase = await createClient()
+    // Usar Service Client para ignorar RLS e encontrar a receita para o paciente (que não está logado)
+    const supabase = createServiceClient()
     
     // Buscar os dados frescos do banco sem cache
     const { data, error } = await supabase

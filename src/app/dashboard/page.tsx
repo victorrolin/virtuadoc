@@ -63,7 +63,8 @@ export default async function DashboardPage() {
       .from('appointments')
       .select('id, status, doctor_id')
       .eq('doctor_id', user!.id)
-      .in('status', ['paid', 'completed'])
+      .eq('status', 'completed')
+      .gte('appointment_date', firstDayOfMonth)
 
     if (earningsError) {
       console.error('Erro ao buscar faturamento:', earningsError)

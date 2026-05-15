@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               <tr><td align="center">
                 <a href="${magicLink}"
-                   style="display:inline-block;background:linear-gradient(135deg,#00f2fe,#4facfe);color:#000;font-weight:800;font-size:16px;padding:18px 48px;border-radius:100px;text-decoration:none;letter-spacing:-0.3px;">
+                   style="display:inline-block;background-color:#00f2fe;color:#000;font-weight:800;font-size:16px;padding:18px 48px;border-radius:100px;text-decoration:none;letter-spacing:-0.3px;">
                   Acessar Minhas Consultas
                 </a>
               </td></tr>

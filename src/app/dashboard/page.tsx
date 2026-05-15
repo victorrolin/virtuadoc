@@ -136,10 +136,16 @@ export default async function DashboardPage() {
               </div>
               <span className="text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-1 rounded-md uppercase tracking-wider">Mês Atual</span>
             </div>
-            <div className="text-3xl font-bold text-white mb-1">
+            <div className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Faturamento Bruto</div>
+            <div className="text-2xl font-bold text-white mb-4">
               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(completedTotal)}
             </div>
-            <div className="text-sm font-medium text-gray-400">Faturamento Estimado</div>
+            <div className="pt-4 border-t border-white/5">
+              <p className="text-[10px] text-gray-500 uppercase font-black mb-0.5">Seu Recebimento (80%)</p>
+              <p className="text-xl font-bold text-green-400">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(completedTotal * 0.8)}
+              </p>
+            </div>
           </div>
         )}
       </div>

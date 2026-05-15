@@ -39,6 +39,8 @@ export default async function AdminPage() {
     .select('amount_paid, status')
 
   const totalRevenue = allAppointments?.reduce((acc, appt) => acc + (Number(appt.amount_paid) || 0), 0) || 0
+  const platformProfit = totalRevenue * 0.20
+  const doctorPayouts = totalRevenue * 0.80
   const completedAppts = allAppointments?.filter(a => a.status === 'completed').length || 0
 
   const { data: doctors } = await supabase
@@ -72,6 +74,16 @@ export default async function AdminPage() {
           <h3 className="text-2xl font-bold text-white mt-1">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalRevenue)}
           </h3>
+          <div className="mt-4 pt-4 border-t border-white/5 flex justify-between gap-4">
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase font-black">Lucro (20%)</p>
+              <p className="text-sm font-bold text-green-400">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(platformProfit)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] text-gray-500 uppercase font-black">Repasse (80%)</p>
+              <p className="text-sm font-bold text-gray-300">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(doctorPayouts)}</p>
+            </div>
+          </div>
         </div>
 
         <div className="glass p-6 rounded-2xl border-b-4 border-secondary bg-secondary/5">
@@ -82,6 +94,7 @@ export default async function AdminPage() {
           </div>
           <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Médicos Ativos</p>
           <h3 className="text-2xl font-bold text-white mt-1">{doctorsCount || 0}</h3>
+          <p className="text-[10px] text-gray-500 mt-4 uppercase font-bold tracking-widest">Corpo Clínico Ativo</p>
         </div>
 
         <div className="glass p-6 rounded-2xl border-b-4 border-teal-500 bg-teal-500/5">
@@ -92,6 +105,7 @@ export default async function AdminPage() {
           </div>
           <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Consultas Realizadas</p>
           <h3 className="text-2xl font-bold text-white mt-1">{completedAppts}</h3>
+          <p className="text-[10px] text-gray-500 mt-4 uppercase font-bold tracking-widest">Sucesso Operacional</p>
         </div>
 
         <div className="glass p-6 rounded-2xl border-b-4 border-orange-500 bg-orange-500/5">
@@ -102,6 +116,7 @@ export default async function AdminPage() {
           </div>
           <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Total de Pacientes</p>
           <h3 className="text-2xl font-bold text-white mt-1">{patientsCount || 0}</h3>
+          <p className="text-[10px] text-gray-500 mt-4 uppercase font-bold tracking-widest">Base de Usuários</p>
         </div>
       </div>
 

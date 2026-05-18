@@ -6,7 +6,6 @@ import { signOut } from '@/app/actions/auth'
 import { BackButton } from '@/components/BackButton'
 import { SidebarPrescriptionButton } from '@/components/SidebarPrescriptionButton'
 import { MobileNav } from '@/components/MobileNav'
-import { MobileFAB } from '@/components/MobileFAB'
 
 export default async function DashboardLayout({
   children,
@@ -140,8 +139,6 @@ export default async function DashboardLayout({
         </div>
       </main>
 
-      {/* FAB Mobile for Doctors */}
-      {role === 'doctor' && <MobileFAB doctorName={profile?.full_name || 'Médico'} />}
     </div>
   )
 }

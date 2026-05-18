@@ -67,3 +67,36 @@ export async function getSchedule() {
     
   return data || []
 }
+
+export async function saveOnlineStatus(isOnline: boolean) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_online_now: isOnline })
+    .eq('id', user.id)
+
+  if (error) {
+    console.error('Error saving online status:', error)
+    throw new Error('Falha ao atualizar status online.')
+  }
+
+  revalidatePath('/dashboard/agenda')
+}
+
+export async function getOnlineStatus() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('is_online_now')
+    .eq('id', user.id)
+    .single()
+
+  if (error || !data) return false
+  return data.is_online_now === true
+}

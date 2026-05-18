@@ -1,7 +1,8 @@
-import { getSchedule, saveSchedule } from '@/app/actions/agenda'
-import { Save, Clock } from 'lucide-react'
+import { getSchedule, saveSchedule, getOnlineStatus } from '@/app/actions/agenda'
+import { Save, Clock, ShieldCheck, AlertCircle } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { OnlineToggle } from '@/components/OnlineToggle'
 
 const DAYS_OF_WEEK = [
   { id: 0, name: 'Domingo' },
@@ -28,16 +29,42 @@ export default async function AgendaPage() {
   }
 
   const existingSchedules = await getSchedule()
+  const isOnlineNow = await getOnlineStatus()
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+      <div>
         <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
           <Clock className="h-8 w-8 text-secondary" /> Minha Agenda
         </h1>
         <p className="text-gray-400">
-          Defina os dias e horários da semana que você atende. Os pacientes só poderão marcar consultas nos horários configurados aqui.
+          Gerencie seus horários de atendimento e sua disponibilidade em tempo real.
         </p>
+      </div>
+
+      <OnlineToggle initialStatus={isOnlineNow} />
+
+      {/* Regras da Plataforma */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="glass p-5 rounded-2xl border-l-4 border-primary bg-primary/5 flex gap-4">
+          <Clock className="h-6 w-6 text-primary flex-shrink-0" />
+          <div>
+            <h3 className="text-white font-bold mb-1">Antecedência de 24h</h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Para sua organização, os pacientes só podem agendar consultas com no mínimo 24 horas de antecedência (exceto se você estiver "Online Agora").
+            </p>
+          </div>
+        </div>
+
+        <div className="glass p-5 rounded-2xl border-l-4 border-green-500 bg-green-500/5 flex gap-4">
+          <ShieldCheck className="h-6 w-6 text-green-500 flex-shrink-0" />
+          <div>
+            <h3 className="text-white font-bold mb-1">Garantia ao Paciente</h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Caso você não possa comparecer à consulta, o dinheiro do paciente é <strong>estornado automaticamente</strong>, garantindo segurança e confiança na plataforma.
+            </p>
+          </div>
+        </div>
       </div>
 
       <form action={saveSchedule} className="glass p-8 rounded-2xl">

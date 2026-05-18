@@ -43,18 +43,29 @@ export default async function DoctorProfilePage({
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Doctor Header Info */}
-        <div className="glass rounded-3xl p-8 mb-8 flex flex-col md:flex-row gap-8 items-start">
-          <div className="h-32 w-32 rounded-3xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-5xl shadow-[0_0_40px_rgba(0,242,254,0.3)] shrink-0">
+        <div className="glass rounded-3xl p-8 mb-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
+          {doctor.is_online_now && (
+            <div className="absolute top-0 right-0 bg-green-500 text-black font-black text-[10px] uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-[0_0_20px_rgba(34,197,94,0.4)] flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
+              Plantão Online
+            </div>
+          )}
+          <div className="relative h-32 w-32 rounded-3xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-5xl shadow-[0_0_40px_rgba(0,242,254,0.3)] shrink-0">
             {doctor.avatar_url ? (
               <Image src={doctor.avatar_url} alt={doctor.full_name} width={128} height={128} className="object-cover w-full h-full" unoptimized />
             ) : (
               doctor.full_name?.charAt(0)
             )}
+            {doctor.is_online_now && (
+              <div className="absolute bottom-2 right-2 h-5 w-5 bg-green-500 border-[3px] border-[#0a0a0a] rounded-full shadow-[0_0_15px_rgba(34,197,94,0.8)] animate-pulse"></div>
+            )}
           </div>
-          <div className="flex-1">
+          <div className="flex-1 mt-2 md:mt-0">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">{doctor.full_name}</h1>
+                <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                  {doctor.full_name}
+                </h1>
                 <p className="text-gray-400 mb-4">{doctor.bio || 'Especialista focado em oferecer o melhor atendimento telemedicina com empatia e técnica.'}</p>
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
                   <div className="flex items-center gap-1"><Star className="h-4 w-4 text-yellow-500 fill-yellow-500" /> 5.0 Avaliações</div>
@@ -62,9 +73,18 @@ export default async function DoctorProfilePage({
                   <div className="flex items-center gap-1"><MapPin className="h-4 w-4 text-green-400" /> Brasil</div>
                 </div>
               </div>
-              <div className="text-left md:text-right">
+              <div className="text-left md:text-right flex flex-col md:items-end">
                 <p className="text-sm text-gray-500 mb-1">Valor da consulta</p>
-                <p className="text-3xl font-bold text-white">R$ {doctor.price_per_consultation || '150.00'}</p>
+                <p className="text-3xl font-bold text-white mb-4">R$ {doctor.price_per_consultation || '150.00'}</p>
+                
+                {doctor.is_online_now && (
+                  <Link 
+                    href={`/checkout?doctor=${doctor.id}&date=${new Date().toISOString().split('T')[0]}&time=IMEDIATO&name=${encodeURIComponent(doctor.full_name)}&specialty=${encodeURIComponent(doctor.specialties || '')}&price=${doctor.price_per_consultation || 0}`}
+                    className="bg-green-500 hover:bg-green-400 text-black font-black px-6 py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:scale-105 hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] flex items-center justify-center gap-2 w-full md:w-auto"
+                  >
+                    Atendimento Imediato <Activity className="h-5 w-5" />
+                  </Link>
+                )}
               </div>
             </div>
           </div>

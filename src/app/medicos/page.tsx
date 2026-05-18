@@ -46,16 +46,22 @@ export default async function MedicosPage() {
             {doctors?.map((doctor) => (
               <Link href={`/medico/${doctor.id}`} key={doctor.id} className="block glass rounded-3xl p-6 transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,242,254,0.1)] group">
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="h-16 w-16 rounded-2xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
+                  <div className="relative h-16 w-16 rounded-2xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
                     {doctor.avatar_url ? (
                       <Image src={doctor.avatar_url} alt={doctor.full_name} width={64} height={64} className="object-cover w-full h-full" unoptimized />
                     ) : (
                       doctor.full_name?.charAt(0)
                     )}
+                    {doctor.is_online_now && (
+                      <div className="absolute bottom-1 right-1 h-3.5 w-3.5 bg-green-500 border-2 border-black rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse" title="Disponível agora"></div>
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors">
+                    <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors flex items-center gap-2">
                       {doctor.full_name}
+                      {doctor.is_online_now && (
+                        <span className="text-[9px] uppercase font-black bg-green-500/20 text-green-500 px-2 py-0.5 rounded-full border border-green-500/30">Plantão</span>
+                      )}
                     </h3>
                     <p className="text-sm text-gray-400 flex items-center gap-1 mt-1">
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />

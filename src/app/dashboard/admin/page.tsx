@@ -1,6 +1,7 @@
 import { AdminDoctorForm } from '@/components/AdminDoctorForm'
 import { DeleteDoctorButton } from '@/components/DeleteDoctorButton'
 import { AdminAccountSettings } from '@/components/AdminAccountSettings'
+import { EvolutionApiSettings } from '@/components/EvolutionApiSettings'
 import { createClient } from '@/lib/supabase/server'
 import { ShieldCheck, Users, DollarSign, Activity, TrendingUp, Calendar } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -176,21 +177,24 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      {/* Configurações de conta */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-        <AdminAccountSettings />
-        <div className="lg:col-span-2 glass p-8 rounded-3xl border border-white/5 bg-gradient-to-br from-primary/5 to-transparent flex flex-col justify-center gap-4">
+      {/* Configurações de conta e API */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+        <div className="space-y-8">
+          <AdminAccountSettings />
+          <EvolutionApiSettings />
+        </div>
+        <div className="glass p-8 rounded-3xl border border-white/5 bg-gradient-to-br from-primary/5 to-transparent flex flex-col justify-center gap-4">
           <h3 className="text-white font-bold text-lg flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" /> Governança & Segurança
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-4">
             <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
               <p className="text-white text-sm font-bold mb-1">Acesso Hierárquico</p>
               <p className="text-gray-400 text-xs leading-relaxed">Admins têm permissão total para gerenciar fluxos financeiros e remover profissionais.</p>
             </div>
             <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
-              <p className="text-white text-sm font-bold mb-1">Auditoria de CRM</p>
-              <p className="text-gray-400 text-xs leading-relaxed">Certifique-se de validar os dados no portal do CFM antes de ativar novos médicos.</p>
+              <p className="text-white text-sm font-bold mb-1">Integrações Automáticas</p>
+              <p className="text-gray-400 text-xs leading-relaxed">O sistema WhatsApp pela Evolution API é gerido de forma centralizada e sem limite de instâncias.</p>
             </div>
           </div>
         </div>

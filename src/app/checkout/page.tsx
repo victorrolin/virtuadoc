@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Activity, ArrowLeft, Calendar, Clock, User, Mail, Phone, CreditCard, CheckCircle2, Video, Loader2, FileText, Zap } from 'lucide-react'
+import { Activity, ArrowLeft, Calendar, Clock, User, Mail, Phone, CreditCard, CheckCircle2, Video, Loader2, FileText, Zap, Check, Copy } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 

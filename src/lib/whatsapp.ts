@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-
 export async function sendWhatsAppMessage({
   to,
   text,
@@ -7,27 +5,9 @@ export async function sendWhatsAppMessage({
   to: string
   text: string
 }) {
-  const adminClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
-  )
-
-  let dbUrl = '', dbInstance = '', dbKey = ''
-  try {
-    const { data } = await adminClient.from('system_settings').select('key, value').in('key', ['EVOLUTION_API_URL', 'EVOLUTION_INSTANCE_NAME', 'EVOLUTION_API_KEY'])
-    if (data) {
-      dbUrl = data.find((d: any) => d.key === 'EVOLUTION_API_URL')?.value || ''
-      dbInstance = data.find((d: any) => d.key === 'EVOLUTION_INSTANCE_NAME')?.value || ''
-      dbKey = data.find((d: any) => d.key === 'EVOLUTION_API_KEY')?.value || ''
-    }
-  } catch (e) {
-    // Tabela pode não existir, ignorar
-  }
-
-  const apiUrl = dbUrl || process.env.EVOLUTION_API_URL
-  const instanceName = dbInstance || process.env.EVOLUTION_INSTANCE_NAME
-  const apiKey = dbKey || process.env.EVOLUTION_API_KEY
+  const apiUrl = process.env.EVOLUTION_API_URL
+  const instanceName = process.env.EVOLUTION_INSTANCE_NAME
+  const apiKey = process.env.EVOLUTION_API_KEY
 
   if (!apiUrl || !instanceName || !apiKey) {
     console.warn('⚠️ Credenciais da Evolution API não configuradas. Mensagem de WhatsApp não enviada.')
@@ -44,7 +24,6 @@ export async function sendWhatsAppMessage({
   }
 
   // Agora deve ter DDD + número (10 ou 11 dígitos)
-  // Adiciona o DDI 55 + garante 9 dígito (nono dígito) se for celular com 10 dígitos
   if (formattedNumber.length === 10) {
     // Número sem o 9 na frente — insere o 9 após o DDD
     formattedNumber = `55${formattedNumber.slice(0, 2)}9${formattedNumber.slice(2)}`
@@ -55,7 +34,7 @@ export async function sendWhatsAppMessage({
 
   try {
     const url = `${apiUrl.replace(/\/$/, '')}/message/sendText/${instanceName}`
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {

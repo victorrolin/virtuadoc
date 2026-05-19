@@ -63,7 +63,7 @@ export default async function DashboardPage() {
       .from('appointments')
       .select('id, status, doctor_id')
       .eq('doctor_id', user!.id)
-      .eq('status', 'completed')
+      .in('status', ['completed', 'paid'])
       .gte('appointment_date', firstDayOfMonth)
 
     if (earningsError) {

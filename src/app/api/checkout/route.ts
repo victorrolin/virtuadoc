@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
           failure: `${appUrl}/pagamento/falha`,
           pending: `${appUrl}/pagamento/pendente`,
         },
-        auto_return: 'approved',
+        auto_return: 'all',
         notification_url: `${appUrl}/api/webhook/mp`,
         metadata: {
           doctor_id: doctorId,

@@ -2,9 +2,8 @@
 
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Activity, ArrowLeft, Calendar, Clock, User, Mail, Phone, CreditCard, CheckCircle2, Video, Loader2, FileText, Copy, Check, Zap } from 'lucide-react'
+import { Activity, ArrowLeft, Calendar, Clock, User, Mail, Phone, CreditCard, CheckCircle2, Video, Loader2, FileText, Zap } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
 
 function CheckoutContent() {
   const searchParams = useSearchParams()
@@ -60,34 +59,17 @@ function CheckoutContent() {
     e.preventDefault()
     setLoading(true)
     try {
-      if (paymentMethod === 'pix') {
-        // Pix transparente — fica na nossa página
-        const res = await fetch('/api/checkout/pix', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty }),
-        })
-        const data = await res.json()
-        if (data.success) {
-          setPixData(data)
-          setStep('pix')
-          startPolling(String(data.paymentId))
-        } else {
-          alert('Erro ao gerar Pix: ' + (data.error || 'Tente novamente'))
-        }
+      // Todos os métodos usam o Checkout Pro do MP
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty, paymentMethod }),
+      })
+      const data = await res.json()
+      if (data.success && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
       } else {
-        // Cartão/Boleto → redireciona para MP Checkout Pro
-        const res = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty }),
-        })
-        const data = await res.json()
-        if (data.success && data.checkoutUrl) {
-          window.location.href = data.checkoutUrl
-        } else {
-          alert('Erro ao iniciar pagamento: ' + (data.error || 'Tente novamente'))
-        }
+        alert('Erro ao iniciar pagamento: ' + (data.error || 'Tente novamente'))
       }
     } catch { alert('Erro de conexão. Tente novamente.') }
     finally { setLoading(false) }

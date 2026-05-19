@@ -163,7 +163,20 @@ export async function POST(req: NextRequest) {
       if (foundUserId) {
         const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', foundUserId).single()
         if (profile?.phone) {
-          const wpMessage = `Olá${profile.full_name ? `, *${profile.full_name}*` : ''}! 👋\nVocê solicitou um link de acesso ao Portal do Paciente.\n\n🔗 *Seu link de acesso:*\n${magicLink}\n\n⚠️ _Este link é válido por 1 hora e não precisa de senha._`
+          // Encurtar o link antes de enviar no WhatsApp
+          let linkParaEnviar = magicLink
+          try {
+            const shortRes = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(magicLink)}`)
+            if (shortRes.ok) {
+              const shortUrl = await shortRes.text()
+              if (shortUrl.startsWith('http')) linkParaEnviar = shortUrl.trim()
+            }
+          } catch {
+            // Se o encurtador falhar, usa o link original
+          }
+
+          const firstName = profile.full_name?.split(' ')[0] || ''
+          const wpMessage = `Olá${firstName ? `, *${firstName}*` : ''}! 👋\nVocê solicitou acesso ao Portal do Paciente do VirtuaDoctor.\n\n🔑 Clique no link abaixo para entrar sem senha:\n${linkParaEnviar}\n\n⚠️ _Válido por 1 hora. Uso único._`
           await sendWhatsAppMessage({ to: profile.phone, text: wpMessage })
         }
       } else {

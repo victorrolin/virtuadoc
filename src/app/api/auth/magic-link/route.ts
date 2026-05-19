@@ -143,15 +143,31 @@ export async function POST(req: NextRequest) {
 
     // Tentar enviar WhatsApp também
     try {
-      const userId = data.user?.id
-      if (userId) {
-        const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', userId).single()
+      let foundUserId = data.user?.id
+      
+      if (!foundUserId) {
+        // Busca paginada caso a API não tenha retornado o usuário
+        let page = 1
+        while (true) {
+          const { data: usersData } = await adminClient.auth.admin.listUsers({ page, perPage: 100 })
+          if (!usersData || !usersData.users || usersData.users.length === 0) break
+          const u = usersData.users.find(u => u.email === email)
+          if (u) {
+            foundUserId = u.id
+            break
+          }
+          page++
+        }
+      }
+
+      if (foundUserId) {
+        const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', foundUserId).single()
         if (profile?.phone) {
           const wpMessage = `Olá${profile.full_name ? `, *${profile.full_name}*` : ''}! 👋\nVocê solicitou um link de acesso ao Portal do Paciente.\n\n🔗 *Seu link de acesso:*\n${magicLink}\n\n⚠️ _Este link é válido por 1 hora e não precisa de senha._`
           await sendWhatsAppMessage({ to: profile.phone, text: wpMessage })
         }
       } else {
-        console.log('Sem userId retornado pelo generateLink para enviar o zap.')
+        console.log('Sem userId retornado pelo generateLink nem listUsers para enviar o zap.')
       }
     } catch (wpErr) {
       console.error('Erro ao tentar enviar zap:', wpErr)

@@ -140,6 +140,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Erro ao enviar e-mail.' }, { status: 500 })
     }
 
+    // Tentar enviar WhatsApp também
+    const userId = data.user?.id
+    if (userId) {
+      const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', userId).single()
+      if (profile?.phone) {
+        const wpMessage = `Olá${profile.full_name ? `, *${profile.full_name}*` : ''}! 👋\nVocê solicitou um link de acesso ao Portal do Paciente.\n\n🔗 *Seu link de acesso:*\n${magicLink}\n\n⚠️ _Este link é válido por 1 hora e não precisa de senha._`
+        // Usar import dinâmico para evitar problemas de dependência circular ou não importados
+        const { sendWhatsAppMessage } = await import('@/lib/whatsapp')
+        await sendWhatsAppMessage({ to: profile.phone, text: wpMessage })
+      }
+    }
+
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('Magic link error:', err)

@@ -34,10 +34,22 @@ export async function sendWhatsAppMessage({
     return false
   }
 
-  // A Evolution API geralmente precisa que o número tenha apenas números
-  // e o código do país na frente (ex: 5511999999999)
+  // Formatar número para E.164 brasileiro: 55 + DDD (2) + 9 dígitos = 13 dígitos total
+  // Aceita: (51)995762718, 51995762718, 5551995762718, +5551995762718
   let formattedNumber = to.replace(/\D/g, '')
-  if (formattedNumber.length === 10 || formattedNumber.length === 11) {
+
+  // Remove o DDI 55 se já veio, para recolocar corretamente
+  if (formattedNumber.startsWith('55') && formattedNumber.length > 12) {
+    formattedNumber = formattedNumber.slice(2)
+  }
+
+  // Agora deve ter DDD + número (10 ou 11 dígitos)
+  // Adiciona o DDI 55 + garante 9 dígito (nono dígito) se for celular com 10 dígitos
+  if (formattedNumber.length === 10) {
+    // Número sem o 9 na frente — insere o 9 após o DDD
+    formattedNumber = `55${formattedNumber.slice(0, 2)}9${formattedNumber.slice(2)}`
+  } else if (formattedNumber.length === 11) {
+    // Número já tem o 9
     formattedNumber = `55${formattedNumber}`
   }
 

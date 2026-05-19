@@ -31,6 +31,20 @@ function CheckoutContent() {
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', cpf: '', reason: '', notes: '' })
+  const handleInputChange = (key: string, value: string) => {
+    let v = value
+    if (key === 'phone') {
+      v = v.replace(/\D/g, '').slice(0, 11)
+      if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`
+      if (v.length > 10) v = `${v.slice(0, 10)}-${v.slice(10)}`
+    } else if (key === 'cpf') {
+      v = v.replace(/\D/g, '').slice(0, 11)
+      v = v.replace(/(\d{3})(\d)/, '$1.$2')
+      v = v.replace(/(\d{3})(\d)/, '$1.$2')
+      v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+    }
+    setForm(prev => ({ ...prev, [key]: v }))
+  }
 
   function formatDate(d: string) {
     return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
@@ -238,7 +252,7 @@ function CheckoutContent() {
         <div className="flex items-center gap-2 mb-8">
           {['Dados', 'Revisão', 'Pagamento'].map((s, i) => (
             <div key={s} className="flex items-center gap-2 flex-1">
-              <div className={`flex items-center gap-2 text-sm font-medium ${
+               <div className={`flex items-center gap-2 text-sm font-medium ${
                 (i === 0 && step === 'info') || (i === 1 && step === 'review') || (i === 2 && step === 'payment') ? 'text-primary' : 'text-gray-500'
               }`}>
                 <span className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] ${
@@ -300,14 +314,15 @@ function CheckoutContent() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                   {[
-                    { col: 2, label: 'Nome Completo *', key: 'name', type: 'text', ph: 'Seu nome completo' },
-                    { col: 1, label: 'E-mail *', key: 'email', type: 'email', ph: 'seu@email.com' },
-                    { col: 1, label: 'Telefone / WhatsApp *', key: 'phone', type: 'text', ph: '(11) 99999-9999' },
-                    { col: 1, label: 'CPF *', key: 'cpf', type: 'text', ph: '000.000.000-00' },
+                    { col: 2, label: 'Nome Completo *', key: 'name', type: 'text', ph: 'Seu nome completo', pattern: undefined, title: '' },
+                    { col: 1, label: 'E-mail *', key: 'email', type: 'email', ph: 'seu@email.com', pattern: undefined, title: '' },
+                    { col: 1, label: 'WhatsApp *', key: 'phone', type: 'tel', ph: '(11) 99999-9999', pattern: '^\\(\\d{2}\\) \\d{5}-\\d{4}$', title: 'O telefone deve estar no formato (99) 99999-9999' },
+                    { col: 1, label: 'CPF *', key: 'cpf', type: 'text', ph: '000.000.000-00', pattern: '^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$', title: 'O CPF deve estar no formato 000.000.000-00' },
                   ].map(f => (
                     <div key={f.key} className={f.col === 2 ? 'md:col-span-2' : ''}>
                       <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">{f.label}</label>
-                      <input required type={f.type} value={(form as any)[f.key]} onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                      <input required type={f.type} value={(form as any)[f.key]} onChange={e => handleInputChange(f.key, e.target.value)}
+                        pattern={f.pattern} title={f.title}
                         className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
                         placeholder={f.ph} />
                     </div>

@@ -40,8 +40,18 @@ export async function createDoctor(formData: FormData) {
     if (authError) {
       // Se o e-mail já existe, buscar o usuário existente e reutilizá-lo
       if (authError.message.includes('already been registered') || authError.code === 'email_exists') {
-        const { data: existingUsers } = await adminClient.auth.admin.listUsers()
-        const existing = existingUsers.users.find(u => u.email === email)
+        let existing: any = null
+        let page = 1
+        while (true) {
+          const { data: usersData } = await adminClient.auth.admin.listUsers({ page, perPage: 100 })
+          if (!usersData || !usersData.users || usersData.users.length === 0) break
+          const u = usersData.users.find(u => u.email === email)
+          if (u) {
+            existing = u
+            break
+          }
+          page++
+        }
         if (!existing) return { error: 'E-mail já existe mas não foi possível localizar o usuário.' }
         userId = existing.id
         // Atualizar senha e metadados do usuário existente

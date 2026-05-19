@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -33,11 +33,6 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   // Liberar rotas de callback de autenticação (magic link, OAuth, etc.)
-  if (request.nextUrl.pathname.startsWith('/auth/callback')) {
-    return supabaseResponse
-  }
-
-  // Liberar rota de callback do magic link (os tokens chegam no hash, sem cookies ainda)
   if (request.nextUrl.pathname.startsWith('/auth/callback')) {
     return supabaseResponse
   }

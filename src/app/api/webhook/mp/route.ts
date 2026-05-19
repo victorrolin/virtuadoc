@@ -37,8 +37,18 @@ export async function POST(req: NextRequest) {
     )
 
     // Verificar ou criar paciente
-    const { data: existingUsers } = await adminClient.auth.admin.listUsers()
-    let patientId = existingUsers.users.find(u => u.email === meta.patient_email)?.id
+    let patientId: string | undefined
+    let page = 1
+    while (true) {
+      const { data: usersData } = await adminClient.auth.admin.listUsers({ page, perPage: 100 })
+      if (!usersData || !usersData.users || usersData.users.length === 0) break
+      const u = usersData.users.find(u => u.email === meta.patient_email)
+      if (u) {
+        patientId = u.id
+        break
+      }
+      page++
+    }
 
     if (!patientId) {
       const tempPassword = Math.random().toString(36).slice(-8) + 'A1!'

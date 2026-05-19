@@ -24,8 +24,19 @@ export default function AuthCallbackPage() {
       const accessToken = hashParams.get('access_token')
       const refreshToken = hashParams.get('refresh_token')
 
-      if (accessToken && refreshToken) {
-        // Tokens encontrados no hash — estabelecer sessão manualmente
+      const code = searchParams.get('code')
+
+      if (code) {
+        // Fluxo PKCE — trocar código pela sessão
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (error) {
+          console.error('exchangeCodeForSession error:', error.message)
+          router.replace('/login?message=Link+inválido+ou+expirado.+Solicite+um+novo.')
+        } else {
+          router.replace(next)
+        }
+      } else if (accessToken && refreshToken) {
+        // Tokens encontrados no hash — estabelecer sessão manualmente (fluxo implícito)
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -37,7 +48,7 @@ export default function AuthCallbackPage() {
           router.replace(next)
         }
       } else {
-        // Sem hash — verificar se já há sessão ativa (ex: PKCE)
+        // Sem hash ou code — verificar se já há sessão ativa
         const { data } = await supabase.auth.getSession()
         if (data.session) {
           router.replace(next)

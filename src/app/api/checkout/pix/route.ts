@@ -56,9 +56,25 @@ export async function POST(req: NextRequest) {
     const mpData = await mpRes.json()
 
     if (!mpRes.ok || mpData.error) {
-      console.error('MP Pix error:', JSON.stringify(mpData))
+      // Log completo para diagnóstico
+      console.error('=== MP Pix FULL ERROR ===')
+      console.error('status:', mpRes.status)
+      console.error('error:', mpData.error)
+      console.error('message:', mpData.message)
+      console.error('causes:', JSON.stringify(mpData.cause || mpData.causes || []))
+      console.error('full response:', JSON.stringify(mpData))
+
+      // Monta mensagem legível com as causes
+      const causes = (mpData.cause || mpData.causes || [])
+        .map((c: any) => `[${c.code}] ${c.description}`)
+        .join(' | ')
+
+      const errorMsg = causes
+        ? `${mpData.message} → ${causes}`
+        : mpData.message || 'Erro ao gerar Pix'
+
       return NextResponse.json(
-        { success: false, error: mpData?.message || 'Erro ao gerar Pix' },
+        { success: false, error: errorMsg, debug: mpData },
         { status: 500 }
       )
     }

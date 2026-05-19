@@ -1,49 +1,23 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const hash = searchParams.get('h')
+  const token = searchParams.get('t')
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
   const baseUrl = appUrl.startsWith('http') ? appUrl : `https://${appUrl}`
 
-  if (!hash) {
+  if (!token) {
     return NextResponse.redirect(new URL('/login?message=Link+de+acesso+inválido.', baseUrl))
   }
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Ignorar erros se executado durante redirecionamento
-          }
-        },
-      },
-    }
-  )
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://vghfzvevlfxtpitmqmsv.supabase.co'
+  const cleanSupabaseUrl = supabaseUrl.endsWith('/') ? supabaseUrl.slice(0, -1) : supabaseUrl
+  
+  const callbackUrl = `${baseUrl}/auth/callback?next=/dashboard/minhas-consultas`
 
-  const { error } = await supabase.auth.verifyOtp({
-    token_hash: hash,
-    type: 'magiclink',
-  })
+  // Reconstrói e redireciona direto para a rota oficial e segura de verificação do Supabase
+  const officialVerifyUrl = `${cleanSupabaseUrl}/auth/v1/verify?token=${token}&type=magiclink&redirect_to=${encodeURIComponent(callbackUrl)}`
 
-  if (error) {
-    console.error('Erro ao verificar OTP pelo link curto:', error.message)
-    return NextResponse.redirect(new URL('/login?message=Link+expirado+ou+já+utilizado.+Solicite+um+novo.', baseUrl))
-  }
-
-  return NextResponse.redirect(new URL('/dashboard/minhas-consultas', baseUrl))
+  return NextResponse.redirect(officialVerifyUrl)
 }

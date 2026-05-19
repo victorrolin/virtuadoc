@@ -163,8 +163,15 @@ export async function POST(req: NextRequest) {
       if (foundUserId) {
         const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', foundUserId).single()
         if (profile?.phone) {
-          const tokenHash = data.properties?.hashed_token
-          const wpShortLink = tokenHash ? `${appUrl}/auth/v?h=${tokenHash}` : magicLink
+          let rawToken = ''
+          try {
+            const urlObj = new URL(magicLink)
+            rawToken = urlObj.searchParams.get('token') || ''
+          } catch (e) {
+            console.error('Erro ao fazer parse da URL do magicLink:', e)
+          }
+
+          const wpShortLink = rawToken ? `${appUrl}/auth/v?t=${rawToken}` : magicLink
 
           const wpMessage = `Olá${profile.full_name ? `, *${profile.full_name}*` : ''}! 👋\nVocê solicitou um link de acesso ao Portal do Paciente.\n\n🔗 *Acesse sua conta aqui:*\n${wpShortLink}\n\n⚠️ _Este link é válido por 1 hora e não precisa de senha._`
           await sendWhatsAppMessage({ to: profile.phone, text: wpMessage })

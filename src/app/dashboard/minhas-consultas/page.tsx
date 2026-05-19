@@ -1,9 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Video, Calendar, Clock, User, ExternalLink, ArrowRight, FileText, Download, ShieldCheck } from 'lucide-react'
+import { Video, Calendar, Clock, User, ExternalLink, ArrowRight, FileText, Download, ShieldCheck, Zap, Radio } from 'lucide-react'
 import Link from 'next/link'
 import { MeetLinkButton } from '@/components/MeetLinkButton'
 import { getPatientPrescriptions } from '@/app/actions/prescriptions'
+
+// Força nova busca a cada requisição — desativa cache do Next.js
+export const dynamic = 'force-dynamic'
 
 export default async function MinhasConsultasPage() {
   const supabase = await createClient()
@@ -21,16 +24,20 @@ export default async function MinhasConsultasPage() {
 
   const today = new Date().toISOString().split('T')[0]
 
-  const { data: upcoming } = await supabase
+  const { data: upcoming, error: upcomingError } = await supabase
     .from('appointments')
     .select(`
-      id, appointment_date, start_time, end_time, status, meeting_link,
-      doctor:profiles!appointments_doctor_id_fkey(full_name, specialties, crm)
+      id, doctor_id, appointment_date, start_time, end_time, status, meeting_link,
+      doctor:profiles!appointments_doctor_id_fkey(full_name, specialties, crm, is_online_now)
     `)
     .eq('patient_id', user.id)
     .in('status', ['paid', 'pending'])
     .gte('appointment_date', today)
     .order('appointment_date', { ascending: true })
+
+  // DEBUG — remover após confirmar funcionamento
+  console.log('[MinhasConsultas] upcoming error:', upcomingError)
+  console.log('[MinhasConsultas] upcoming data:', JSON.stringify(upcoming, null, 2))
 
   const { data: past } = await supabase
     .from('appointments')
@@ -95,45 +102,88 @@ export default async function MinhasConsultasPage() {
               const active = isNow(appt.appointment_date, appt.start_time)
               const doctor = appt.doctor as any
               const meetLink = appt.meeting_link || `https://meet.jit.si/virtuadoc-${appt.id}`
+              const doctorOnline = doctor?.is_online_now === true
 
               return (
-                <div key={appt.id} className={`p-5 rounded-xl border transition-all ${
-                  active
-                    ? 'bg-primary/10 border-primary/30 shadow-[0_0_20px_rgba(0,242,254,0.1)]'
-                    : 'bg-black/20 border-white/5'
+                <div key={appt.id} className={`rounded-xl border transition-all overflow-hidden ${
+                  doctorOnline
+                    ? 'border-green-400/40 shadow-[0_0_25px_rgba(34,197,94,0.12)]'
+                    : active
+                      ? 'border-primary/30 shadow-[0_0_20px_rgba(0,242,254,0.1)]'
+                      : 'border-white/5'
                 }`}>
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${active ? 'bg-primary/20' : 'bg-white/5'}`}>
-                        <User className={`h-6 w-6 ${active ? 'text-primary' : 'text-gray-400'}`} />
+
+                  {/* ── Banner: médico online agora ── */}
+                  {doctorOnline && (
+                    <div className="bg-green-500/10 border-b border-green-400/20 px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green-500/20 border border-green-400/30 shrink-0">
+                          <Radio className="h-3.5 w-3.5 text-green-400" />
+                        </span>
+                        <div>
+                          <p className="text-green-400 font-bold text-sm flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                            Dr(a). {doctor?.full_name?.split(' ')[0]} está online agora!
+                          </p>
+                          <p className="text-gray-400 text-[11px] leading-tight">
+                            Disponível para adiantar sua consulta se você quiser.
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-white font-semibold">Dr(a). {doctor?.full_name || 'Médico'}</h3>
-                          {active && (
-                            <span className="text-xs px-2 py-0.5 bg-primary/20 text-primary rounded-full font-medium animate-pulse">
-                              Agora!
+                      <a
+                        href={meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 flex items-center gap-2 bg-green-500 hover:bg-green-400 text-black font-black px-4 py-2 rounded-xl text-xs transition-all shadow-[0_0_15px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)]"
+                      >
+                        <Zap className="h-3.5 w-3.5" />
+                        Entrar Agora
+                      </a>
+                    </div>
+                  )}
+
+                  {/* ── Corpo do card ── */}
+                  <div className={`p-5 ${
+                    doctorOnline ? 'bg-green-500/5' : active ? 'bg-primary/10' : 'bg-black/20'
+                  }`}>
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          doctorOnline ? 'bg-green-500/20' : active ? 'bg-primary/20' : 'bg-white/5'
+                        }`}>
+                          <User className={`h-6 w-6 ${
+                            doctorOnline ? 'text-green-400' : active ? 'text-primary' : 'text-gray-400'
+                          }`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h3 className="text-white font-semibold">Dr(a). {doctor?.full_name || 'Médico'}</h3>
+                            {active && !doctorOnline && (
+                              <span className="text-xs px-2 py-0.5 bg-primary/20 text-primary rounded-full font-medium animate-pulse">
+                                Agora!
+                              </span>
+                            )}
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/20 text-green-400">
+                              Confirmada
                             </span>
-                          )}
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/20 text-green-400">
-                            Confirmada
-                          </span>
+                          </div>
+                          <p className="text-sm text-primary/80 mb-1">{doctor?.specialties}</p>
+                          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3.5 w-3.5" />
+                              {formatDate(appt.appointment_date)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3.5 w-3.5" />
+                              {appt.start_time?.slice(0, 5)} – {appt.end_time?.slice(0, 5)}
+                            </span>
+                          </div>
+                          <MeetLinkButton link={meetLink} />
                         </div>
-                        <p className="text-sm text-primary/80 mb-1">{doctor?.specialties}</p>
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3.5 w-3.5" />
-                            {formatDate(appt.appointment_date)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3.5 w-3.5" />
-                            {appt.start_time?.slice(0, 5)} – {appt.end_time?.slice(0, 5)}
-                          </span>
-                        </div>
-                        <MeetLinkButton link={meetLink} />
                       </div>
                     </div>
                   </div>
+
                 </div>
               )
             })}

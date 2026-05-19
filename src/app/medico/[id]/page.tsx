@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getDoctorAvailableSlots } from '@/app/actions/appointments'
-import { Activity, MapPin, Star, Video, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react'
+import { Activity, MapPin, Star, Video, ArrowLeft, Calendar as CalendarIcon, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
@@ -25,6 +25,7 @@ export default async function DoctorProfilePage({
   }
 
   const availableDays = await getDoctorAvailableSlots(doctor.id)
+  const isOnline = doctor.is_online_now === true
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,8 +44,10 @@ export default async function DoctorProfilePage({
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Doctor Header Info */}
-        <div className="glass rounded-3xl p-8 mb-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
-          {doctor.is_online_now && (
+        <div className={`glass rounded-3xl p-8 mb-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden ${
+          isOnline ? 'border border-green-500/20' : ''
+        }`}>
+          {isOnline && (
             <div className="absolute top-0 right-0 bg-green-500 text-black font-black text-[10px] uppercase tracking-widest px-6 py-2 rounded-bl-3xl shadow-[0_0_20px_rgba(34,197,94,0.4)] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
               Plantão Online
@@ -56,13 +59,21 @@ export default async function DoctorProfilePage({
             ) : (
               doctor.full_name?.charAt(0)
             )}
-            {doctor.is_online_now && (
-              <div className="absolute bottom-2 right-2 h-5 w-5 bg-green-500 border-[3px] border-[#0a0a0a] rounded-full shadow-[0_0_15px_rgba(34,197,94,0.8)] animate-pulse"></div>
+            {/* Indicador online no avatar */}
+            {isOnline && (
+              <span className="absolute bottom-1.5 right-1.5 h-5 w-5 rounded-full bg-green-400 border-2 border-black shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
             )}
           </div>
           <div className="flex-1 mt-2 md:mt-0">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
               <div>
+                {/* Badge Online */}
+                {isOnline && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/15 border border-green-400/30 text-green-400 text-xs font-bold mb-3">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                    Online Agora · Disponível para atendimento imediato
+                  </div>
+                )}
                 <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
                   {doctor.full_name}
                 </h1>
@@ -90,6 +101,32 @@ export default async function DoctorProfilePage({
           </div>
         </div>
 
+        {/* Botão de Atendimento Imediato — visível apenas quando médico está online */}
+        {isOnline && (
+          <div className="mb-8 glass rounded-3xl p-6 border border-green-400/25 bg-green-500/5">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-green-500/20 border border-green-400/30 flex items-center justify-center shrink-0">
+                  <Zap className="h-6 w-6 text-green-400" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white mb-0.5">Atendimento Imediato Disponível</h2>
+                  <p className="text-sm text-gray-400">
+                    Este médico está online agora. Pague e entre na videochamada em minutos.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href={`/checkout?doctor=${doctor.id}&date=${new Date().toISOString().split('T')[0]}&time=${new Date().toTimeString().slice(0,5)}&name=${encodeURIComponent(doctor.full_name)}&specialty=${encodeURIComponent(doctor.specialties || '')}&price=${doctor.price_per_consultation || 0}&mode=immediate`}
+                className="whitespace-nowrap shrink-0 flex items-center gap-2 bg-green-500 hover:bg-green-400 text-black font-bold px-6 py-3 rounded-2xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
+              >
+                <Zap className="h-5 w-5" />
+                Consultar Agora
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Scheduling Section */}
         <div className="glass rounded-3xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
@@ -99,8 +136,14 @@ export default async function DoctorProfilePage({
           {availableDays.length === 0 ? (
             <div className="text-center py-12 bg-black/20 rounded-2xl border border-white/5">
               <CalendarIcon className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-1">Agenda indisponível</h3>
-              <p className="text-gray-500 text-sm">Este médico ainda não liberou horários para os próximos dias.</p>
+              <h3 className="text-lg font-medium text-white mb-1">
+                {isOnline ? 'Sem horários pré-agendados' : 'Agenda indisponível'}
+              </h3>
+              <p className="text-gray-500 text-sm">
+                {isOnline
+                  ? 'Use o botão "Consultar Agora" acima para atendimento imediato.'
+                  : 'Este médico ainda não liberou horários para os próximos dias.'}
+              </p>
             </div>
           ) : (
             <div className="space-y-8">

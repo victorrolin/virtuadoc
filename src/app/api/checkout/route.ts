@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
           failure: `${appUrl}/pagamento/falha`,
           pending: `${appUrl}/pagamento/pendente`,
         },
-        auto_return: 'approved',
+        auto_return: 'all',
         notification_url: `${appUrl}/api/webhook/mp`,
         metadata: {
           doctor_id: doctorId,
@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
           meet_link: meetLink,
           reason: reason || '',
         },
+        external_reference: roomId,
         statement_descriptor: 'VIRTUADOCTOR',
       }),
     })
@@ -83,6 +84,7 @@ export async function POST(req: NextRequest) {
       checkoutUrl: mpData.init_point,        // Produção
       sandboxUrl: mpData.sandbox_init_point,  // Sandbox
       preferenceId: mpData.id,
+      externalReference: roomId,
     })
   } catch (err: any) {
     console.error('Checkout error:', err)

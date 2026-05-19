@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Activity, ShieldCheck, ArrowRight, AlertTriangle } from 'lucide-react'
 
-export default function VerifyHandoffPage() {
+function VerifyHandoffContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [token, setToken] = useState<string | null>(null)
@@ -119,5 +119,17 @@ export default function VerifyHandoffPage() {
         © 2026 VirtuaDoctor – Telemedicina Premium
       </p>
     </div>
+  )
+}
+
+export default function VerifyHandoffPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#050505] p-4">
+        <Activity className="h-8 w-8 text-primary animate-pulse" />
+      </div>
+    }>
+      <VerifyHandoffContent />
+    </Suspense>
   )
 }

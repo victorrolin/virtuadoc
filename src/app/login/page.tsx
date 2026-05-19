@@ -91,7 +91,7 @@ function LoginForm() {
               </div>
               <h3 className="text-white font-bold text-lg mb-2">Link enviado!</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Verifique seu e-mail e clique no link para acessar sua área de paciente. O link expira em 1 hora.
+                Verifique seu e-mail (e seu WhatsApp) e clique no link para acessar sua área de paciente. O link expira em 1 hora.
               </p>
               <button
                 onClick={() => { setMagicSent(false); setErrorMsg('') }}

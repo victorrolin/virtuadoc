@@ -17,9 +17,10 @@ function CheckoutContent() {
   const specialty = searchParams.get('specialty') || ''
   const price = searchParams.get('price') || '0'
 
-  const [step, setStep] = useState<'info' | 'review' | 'payment' | 'pix' | 'confirmed'>('info')
+  const [step, setStep] = useState<'info' | 'review' | 'payment' | 'pix' | 'confirmed' | 'mp_opened'>('info')
   const [loading, setLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('pix')
+  const [mpCheckoutUrl, setMpCheckoutUrl] = useState('')
 
   // Estado do Pix inline
   const [pixData, setPixData] = useState<{
@@ -59,6 +60,10 @@ function CheckoutContent() {
   async function handlePayment(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+    
+    // Abre a janela de forma síncrona para não ser bloqueada pelo pop-up blocker
+    const newWindow = window.open('about:blank', '_blank')
+    
     try {
       // Todos os métodos usam o Checkout Pro do MP
       const res = await fetch('/api/checkout', {
@@ -68,11 +73,22 @@ function CheckoutContent() {
       })
       const data = await res.json()
       if (data.success && data.checkoutUrl) {
-        window.location.href = data.checkoutUrl
+        setMpCheckoutUrl(data.checkoutUrl)
+        setStep('mp_opened')
+        if (newWindow) {
+          newWindow.location.href = data.checkoutUrl
+        } else {
+          // Se bloqueou de qualquer forma, a tela de step 'mp_opened' terá o botão para abrir
+          window.open(data.checkoutUrl, '_blank')
+        }
       } else {
+        if (newWindow) newWindow.close()
         alert('Erro ao iniciar pagamento: ' + (data.error || 'Tente novamente'))
       }
-    } catch { alert('Erro de conexão. Tente novamente.') }
+    } catch { 
+      if (newWindow) newWindow.close()
+      alert('Erro de conexão. Tente novamente.') 
+    }
     finally { setLoading(false) }
   }
 
@@ -391,10 +407,36 @@ function CheckoutContent() {
                 <div className="flex gap-3">
                   <button type="button" onClick={() => setStep('review')} className="flex-1 border border-white/10 text-gray-400 hover:text-white font-semibold py-4 rounded-xl transition-all">Voltar</button>
                   <button type="submit" disabled={loading} className="flex-[2] bg-gradient-to-r from-primary to-cyan-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-60">
-                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : paymentMethod === 'pix' ? <><Zap className="h-4 w-4" /> Gerar QR Code Pix</> : <>Confirmar Pagamento · R$ {price}</>}
+                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Confirmar Pagamento · R$ {price}</>}
                   </button>
                 </div>
               </form>
+            )}
+
+            {step === 'mp_opened' && (
+              <div className="glass rounded-2xl p-8 border border-white/5 text-center">
+                <div className="h-16 w-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                  <CreditCard className="h-8 w-8 text-primary" />
+                </div>
+                <h2 className="text-xl font-bold text-white mb-4">Pagamento aberto em nova guia</h2>
+                <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                  Conclua o pagamento na aba do Mercado Pago que acabou de ser aberta.<br/>
+                  Assim que finalizar, a nova aba confirmará sua consulta automaticamente.
+                </p>
+                <div className="p-4 rounded-xl bg-yellow-500/5 border border-yellow-500/10 mb-8">
+                  <p className="text-xs text-yellow-400">
+                    ⚠️ Se a nova aba não abriu, seu navegador pode ter bloqueado o pop-up. Clique no botão abaixo para abrir manualmente.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 max-w-sm mx-auto">
+                  <a href={mpCheckoutUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-primary to-cyan-400 text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+                    Abrir Mercado Pago Novamente <ArrowLeft className="h-4 w-4 rotate-180" />
+                  </a>
+                  <button onClick={() => setStep('payment')} className="w-full border border-white/10 text-gray-400 hover:text-white font-semibold py-3 rounded-xl transition-all text-sm">
+                    Voltar e escolher outro método
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

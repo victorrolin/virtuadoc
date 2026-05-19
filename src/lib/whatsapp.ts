@@ -36,7 +36,10 @@ export async function sendWhatsAppMessage({
 
   // A Evolution API geralmente precisa que o número tenha apenas números
   // e o código do país na frente (ex: 5511999999999)
-  const formattedNumber = to.replace(/\D/g, '')
+  let formattedNumber = to.replace(/\D/g, '')
+  if (formattedNumber.length === 10 || formattedNumber.length === 11) {
+    formattedNumber = `55${formattedNumber}`
+  }
 
   try {
     const url = `${apiUrl.replace(/\/$/, '')}/message/sendText/${instanceName}`

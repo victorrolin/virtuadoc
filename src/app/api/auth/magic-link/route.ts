@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
 export async function POST(req: NextRequest) {
   try {
@@ -142,17 +143,15 @@ export async function POST(req: NextRequest) {
 
     // Tentar enviar WhatsApp também
     try {
-      const { data: usersData } = await adminClient.auth.admin.listUsers()
-      const foundUser = usersData.users.find(u => u.email === email)
-      
-      if (foundUser) {
-        const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', foundUser.id).single()
+      const userId = data.user?.id
+      if (userId) {
+        const { data: profile } = await adminClient.from('profiles').select('phone, full_name').eq('id', userId).single()
         if (profile?.phone) {
           const wpMessage = `Olá${profile.full_name ? `, *${profile.full_name}*` : ''}! 👋\nVocê solicitou um link de acesso ao Portal do Paciente.\n\n🔗 *Seu link de acesso:*\n${magicLink}\n\n⚠️ _Este link é válido por 1 hora e não precisa de senha._`
-          // Usar import dinâmico para evitar problemas de dependência circular ou não importados
-          const { sendWhatsAppMessage } = await import('@/lib/whatsapp')
           await sendWhatsAppMessage({ to: profile.phone, text: wpMessage })
         }
+      } else {
+        console.log('Sem userId retornado pelo generateLink para enviar o zap.')
       }
     } catch (wpErr) {
       console.error('Erro ao tentar enviar zap:', wpErr)

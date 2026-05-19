@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { sendConfirmationEmail, sendDoctorNotificationEmail } from '@/lib/email'
+import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
 export async function POST(req: NextRequest) {
   try {
@@ -115,6 +116,19 @@ export async function POST(req: NextRequest) {
       time: meta.appointment_time,
       meetLink: meta.meet_link,
     })
+
+    // Enviar WhatsApp de confirmação para o paciente
+    if (meta.patient_phone) {
+      const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/login`
+      const formattedDate = meta.appointment_date.split('-').reverse().join('/')
+      
+      const wpMessage = `Olá, *${meta.patient_name}*! 👋\nSeu pagamento foi confirmado e sua consulta está agendada! 🎉\n\n👨‍⚕️ *Médico:* ${doctorProfile?.full_name || 'Médico'}\n📅 *Data:* ${formattedDate}\n⏰ *Horário:* ${meta.appointment_time}\n\n📹 *Link da Videochamada:*\n${meta.meet_link}\n\nVocê também pode acessar seu painel do paciente para acompanhar seus agendamentos:\n🔗 ${dashboardUrl}\n\nAgradecemos pela confiança e desejamos uma excelente consulta!`
+
+      await sendWhatsAppMessage({
+        to: meta.patient_phone,
+        text: wpMessage,
+      })
+    }
 
     // Enviar notificação para o médico
     if (doctorEmail) {

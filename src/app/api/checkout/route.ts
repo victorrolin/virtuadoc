@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
           meet_link: meetLink,
           reason: reason || '',
         },
+        external_reference: roomId,
         statement_descriptor: 'VIRTUADOCTOR',
       }),
     })
@@ -83,6 +84,7 @@ export async function POST(req: NextRequest) {
       checkoutUrl: mpData.init_point,        // Produção
       sandboxUrl: mpData.sandbox_init_point,  // Sandbox
       preferenceId: mpData.id,
+      externalReference: roomId,
     })
   } catch (err: any) {
     console.error('Checkout error:', err)

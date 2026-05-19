@@ -36,23 +36,19 @@ function CheckoutContent() {
     return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
   }
 
-  // Polling de status do Pix
-  const startPolling = useCallback((paymentId: string) => {
+  // Polling de status do MP (Checkout Pro)
+  const startPolling = useCallback((externalRef: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current)
     pollingRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`/api/checkout/status?payment_id=${paymentId}`)
+        const res = await fetch(`/api/checkout/status?external_reference=${externalRef}`)
         const data = await res.json()
         if (data.status === 'approved') {
-          setPixStatus('approved')
           clearInterval(pollingRef.current!)
-          setTimeout(() => router.push('/dashboard/minhas-consultas'), 3000)
-        } else if (data.status === 'rejected' || data.status === 'cancelled') {
-          setPixStatus('rejected')
-          clearInterval(pollingRef.current!)
+          router.push(`/pagamento/sucesso?payment_id=${data.id}`)
         }
       } catch { /* continua tentando */ }
-    }, 4000)
+    }, 5000)
   }, [router])
 
   useEffect(() => () => { if (pollingRef.current) clearInterval(pollingRef.current) }, [])
@@ -75,10 +71,15 @@ function CheckoutContent() {
       if (data.success && data.checkoutUrl) {
         setMpCheckoutUrl(data.checkoutUrl)
         setStep('mp_opened')
+        
+        // Inicia o polling na aba original
+        if (data.externalReference) {
+          startPolling(data.externalReference)
+        }
+
         if (newWindow) {
           newWindow.location.href = data.checkoutUrl
         } else {
-          // Se bloqueou de qualquer forma, a tela de step 'mp_opened' terá o botão para abrir
           window.open(data.checkoutUrl, '_blank')
         }
       } else {
@@ -435,6 +436,11 @@ function CheckoutContent() {
                   <button onClick={() => setStep('payment')} className="w-full border border-white/10 text-gray-400 hover:text-white font-semibold py-3 rounded-xl transition-all text-sm">
                     Voltar e escolher outro método
                   </button>
+                </div>
+                
+                <div className="mt-8 flex items-center justify-center gap-2 text-xs text-gray-500">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  Verificando status do pagamento automaticamente...
                 </div>
               </div>
             )}

@@ -66,6 +66,21 @@ export async function POST(req: NextRequest) {
     const endDate = new Date(2000, 0, 1, h, m + duration)
     const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}:00`
 
+    // ── Idempotência: evitar consultas duplicadas ──────────────────────────
+    // O Mercado Pago pode disparar o webhook mais de uma vez para o mesmo pagamento.
+    // Verificamos se já existe um appointment com esse payment_id antes de inserir.
+    const { data: existingAppointment } = await adminClient
+      .from('appointments')
+      .select('id')
+      .eq('payment_id', String(paymentId))
+      .maybeSingle()
+
+    if (existingAppointment) {
+      console.log(`[Webhook MP] Pagamento ${paymentId} já processado — ignorando duplicata.`)
+      return NextResponse.json({ ok: true, msg: 'already_processed' })
+    }
+    // ──────────────────────────────────────────────────────────────────────
+
     await adminClient.from('appointments').insert({
       doctor_id: meta.doctor_id,
       patient_id: patientId,

@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { Calendar, Users, Video, Clock, ArrowRight, Activity, Edit3, Zap } from 'lucide-react'
+import { Calendar, Users, Video, Clock, ArrowRight, Activity, Edit3, Zap, Radio, Star } from 'lucide-react'
 import Link from 'next/link'
 import { DashboardPrescriptionButton } from '@/components/DashboardPrescriptionButton'
 import { CountdownTimer } from '@/components/CountdownTimer'
+import Image from 'next/image'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -18,7 +19,20 @@ export default async function DashboardPage() {
     .single()
 
   const isDoctor = profile?.role === 'doctor'
+  const isPatient = profile?.role === 'patient'
   const today = new Date().toISOString().split('T')[0]
+
+  // Buscar médicos online para o paciente
+  let onlineDoctors: any[] = []
+  if (isPatient) {
+    const { data: onlineData } = await supabase
+      .from('profiles')
+      .select('id, full_name, specialties, price_per_consultation, avatar_url, is_online_now')
+      .eq('role', 'doctor')
+      .eq('is_online_now', true)
+      .limit(3)
+    onlineDoctors = onlineData || []
+  }
 
   // Buscar consultas de hoje e próximas (só para médicos)
   let todayCount = 0
@@ -240,6 +254,11 @@ export default async function DashboardPage() {
                   ? 'Você ainda não tem pacientes agendados. Configure sua agenda para começar a receber consultas.'
                   : 'Você não tem nenhuma consulta marcada. Encontre um médico e agende agora.'}
               </p>
+              {isPatient && (
+                <Link href="/medicos" className="mt-4 flex items-center gap-2 bg-primary text-black font-bold px-6 py-3 rounded-xl hover:bg-primary/90 transition-all">
+                  Buscar Médico <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -291,6 +310,100 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
+
+        {/* Coluna Direita - Painel lateral */}
+
+        {/* Painel do Paciente: médicos online + atalhos */}
+        {isPatient && (
+          <div className="space-y-6">
+            {/* Banner Atendimento Imediato */}
+            {onlineDoctors.length > 0 ? (
+              <div className="glass rounded-2xl border border-green-400/25 bg-green-500/5 overflow-hidden">
+                <div className="px-5 pt-5 pb-3 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                  <h2 className="text-sm font-bold text-green-400 uppercase tracking-wider">
+                    {onlineDoctors.length} médico{onlineDoctors.length > 1 ? 's' : ''} online agora
+                  </h2>
+                </div>
+                <p className="text-xs text-gray-400 px-5 pb-4 leading-relaxed">
+                  Disponíveis para atendimento <strong className="text-white">imediato</strong>. Pague e entre na videochamada em minutos.
+                </p>
+
+                <div className="space-y-2 px-3 pb-4">
+                  {onlineDoctors.map((doc) => (
+                    <Link
+                      key={doc.id}
+                      href={`/medico/${doc.id}`}
+                      className="flex items-center gap-3 p-3 bg-black/30 hover:bg-black/50 rounded-xl border border-green-400/15 hover:border-green-400/30 transition-all group"
+                    >
+                      <div className="relative h-9 w-9 rounded-xl overflow-hidden bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold text-sm shrink-0">
+                        {doc.avatar_url ? (
+                          <Image src={doc.avatar_url} alt={doc.full_name} width={36} height={36} className="object-cover w-full h-full" unoptimized />
+                        ) : (
+                          doc.full_name?.charAt(0)
+                        )}
+                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-400 border border-black" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-xs font-bold truncate">{doc.full_name}</p>
+                        <p className="text-gray-500 text-[10px] truncate">{doc.specialties || 'Clínica Geral'}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-white text-xs font-bold">R$ {doc.price_per_consultation || '—'}</p>
+                        <p className="text-green-400 text-[10px] font-semibold flex items-center gap-0.5 justify-end">
+                          <Zap className="h-2.5 w-2.5" /> Agora
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="px-3 pb-4">
+                  <Link
+                    href="/medicos"
+                    className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-400 text-black font-black py-3 rounded-xl text-sm transition-all shadow-[0_0_20px_rgba(34,197,94,0.2)] hover:shadow-[0_0_30px_rgba(34,197,94,0.4)]"
+                  >
+                    <Radio className="h-4 w-4" />
+                    Consultar Agora
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              /* Sem médicos online — CTA padrão */
+              <div className="glass rounded-2xl p-6 border border-white/5 text-center">
+                <div className="h-12 w-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3">
+                  <Radio className="h-6 w-6 text-gray-600" />
+                </div>
+                <p className="text-white font-bold text-sm mb-1">Nenhum médico online agora</p>
+                <p className="text-gray-500 text-xs mb-4 leading-relaxed">Agende uma consulta com antecedência e receba o link de videochamada por e-mail.</p>
+                <Link href="/medicos" className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/15 text-white font-bold py-2.5 rounded-xl text-sm transition-all">
+                  Ver Médicos Disponíveis <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            )}
+
+            {/* Links rápidos */}
+            <div className="glass rounded-2xl p-5 border border-white/5">
+              <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                <Star className="h-4 w-4 text-yellow-400" /> Acesso Rápido
+              </h2>
+              <div className="space-y-2">
+                {[
+                  { label: 'Minhas Consultas', href: '/dashboard/minhas-consultas', icon: Calendar },
+                  { label: 'Buscar Médicos', href: '/medicos', icon: Users },
+                ].map((item) => (
+                  <Link key={item.label} href={item.href} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all text-xs text-gray-300">
+                    <div className="flex items-center gap-3">
+                      <item.icon className="h-4 w-4 text-gray-500" />
+                      {item.label}
+                    </div>
+                    <ArrowRight className="h-3 w-3 opacity-30" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Coluna Direita - Atalhos do Dr. Virtua */}
         {isDoctor && (

@@ -6,8 +6,11 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const hash = searchParams.get('h')
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
+  const baseUrl = appUrl.startsWith('http') ? appUrl : `https://${appUrl}`
+
   if (!hash) {
-    return NextResponse.redirect(new URL('/login?message=Link+de+acesso+inválido.', request.url))
+    return NextResponse.redirect(new URL('/login?message=Link+de+acesso+inválido.', baseUrl))
   }
 
   const cookieStore = await cookies()
@@ -39,8 +42,8 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error('Erro ao verificar OTP pelo link curto:', error.message)
-    return NextResponse.redirect(new URL('/login?message=Link+expirado+ou+já+utilizado.+Solicite+um+novo.', request.url))
+    return NextResponse.redirect(new URL('/login?message=Link+expirado+ou+já+utilizado.+Solicite+um+novo.', baseUrl))
   }
 
-  return NextResponse.redirect(new URL('/dashboard/minhas-consultas', request.url))
+  return NextResponse.redirect(new URL('/dashboard/minhas-consultas', baseUrl))
 }

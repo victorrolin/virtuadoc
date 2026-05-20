@@ -50,9 +50,10 @@ export default async function ConsultasPage() {
       patient:profiles!appointments_patient_id_fkey(full_name)
     `)
     .eq('doctor_id', user.id)
-    .eq('status', 'completed')
+    .or(`status.in.("completed","cancelled"),appointment_date.lt.${today}`)
     .order('appointment_date', { ascending: false })
-    .limit(10)
+    .order('start_time', { ascending: false })
+    .limit(30)
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr + 'T00:00:00')
@@ -210,7 +211,18 @@ export default async function ConsultasPage() {
                       <p className="text-xs text-gray-500">{formatDate(appt.appointment_date)} às {appt.start_time?.slice(0, 5)}</p>
                     </div>
                   </div>
-                  <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded-full">Concluída</span>
+                  {appt.status === 'completed' && (
+                    <span className="text-xs px-2 py-1 bg-green-500/10 text-green-400 rounded-full">Concluída</span>
+                  )}
+                  {appt.status === 'cancelled' && (
+                    <span className="text-xs px-2 py-1 bg-red-500/10 text-red-400 rounded-full">Cancelada</span>
+                  )}
+                  {appt.status === 'paid' && (
+                    <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-400 rounded-full">Paga</span>
+                  )}
+                  {appt.status === 'pending' && (
+                    <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded-full">Pendente</span>
+                  )}
                 </div>
               )
             })}

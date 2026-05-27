@@ -25,7 +25,13 @@ export async function GET(
       .or(`id.eq.${id},appointment_id.eq.${id}`)
       .maybeSingle()
 
-    const isExam = data?.medications && !Array.isArray(data.medications) && data.medications.type === 'exam'
+    let isExam = false
+    try {
+      const meds = typeof data?.medications === 'string' ? JSON.parse(data.medications) : data?.medications
+      isExam = meds && meds.isExam === true
+    } catch (e) {
+      isExam = false
+    }
 
     if (data?.is_signed && data?.signed_file_url) {
       try {
@@ -60,7 +66,7 @@ export async function GET(
     const baseUrl = new URL(request.url).origin
     const docId = data?.id || id
     if (isExam) {
-      return redirect(`${baseUrl}/exams/${docId}`)
+      return redirect(`${baseUrl}/exames/${docId}`)
     }
     return redirect(`${baseUrl}/prescriptions/${docId}`)
   } catch (error) {

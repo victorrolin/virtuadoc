@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ClipboardList } from 'lucide-react'
+import { Briefcase, Plus } from 'lucide-react'
 import { ExamModal } from './ExamModal'
 
 interface Props {
@@ -15,19 +15,20 @@ export function SidebarExamButton({ doctorName }: Props) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-primary hover:bg-primary/10 font-bold transition-all bg-primary/5 border border-primary/10 hover:border-primary/30 group cursor-pointer"
+        className="w-full flex items-center justify-between p-3 mt-2 rounded-xl bg-gradient-to-r from-secondary/10 to-transparent border border-secondary/20 hover:border-secondary/50 text-white transition-all group"
       >
-        <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-          <ClipboardList className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-secondary/20 flex items-center justify-center">
+            <Briefcase className="h-4 w-4 text-secondary" />
+          </div>
+          <span className="font-semibold text-sm group-hover:text-secondary transition-colors">Novo Exame (ASO)</span>
         </div>
-        <span>Emitir ASO Ocupacional</span>
+        <Plus className="h-4 w-4 text-secondary opacity-50 group-hover:opacity-100 transition-opacity" />
       </button>
 
       <ExamModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        appointmentId=""
-        patientName=""
         doctorName={doctorName}
       />
     </>

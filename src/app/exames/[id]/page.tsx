@@ -46,11 +46,16 @@ export default async function ExamPage({
       }
     }
 
+    // Supabase retorna joins como array — pegar o primeiro elemento
+    const doctorRaw = Array.isArray(dbPrescription?.doctor)
+      ? (dbPrescription.doctor as any[])[0]
+      : (dbPrescription?.doctor as any)
+
     const doctor = { 
-      full_name: dbPrescription?.doctor?.full_name || 'Médico Responsável', 
-      specialties: dbPrescription?.doctor?.specialties || 'Medicina Ocupacional', 
-      crm: dbPrescription?.doctor?.crm || 'Consulte o Assinador',
-      signatureUrl: dbPrescription?.doctor?.avatar_url // Simplification: using avatar for now or ideal signature image field
+      full_name: doctorRaw?.full_name || 'Médico Responsável', 
+      specialties: doctorRaw?.specialties || 'Medicina Ocupacional', 
+      crm: doctorRaw?.crm || 'Consulte o Assinador',
+      signatureUrl: doctorRaw?.avatar_url || null
     }
     const patient = { 
       full_name: dbPrescription?.patient_name || 'Paciente',

@@ -308,52 +308,12 @@ export default async function ExamPage({
                 </p>
               </div>
               
-              {/* Box de Assinatura com Carimbo Realista */}
-              <div className="relative flex flex-col items-center select-none">
-                {/* Assinatura Cursiva do Médico */}
-                <div 
-                  className="absolute -top-12 z-20 font-serif text-3xl text-blue-900/90 tracking-widest pointer-events-none drop-shadow-sm select-none"
-                  style={{ 
-                    fontFamily: "'Dancing Script', cursive", 
-                    transform: 'rotate(-4deg)',
-                    color: '#0f1d5e'
-                  }}
-                >
-                  {doctor.full_name?.split(' ').map((name: string, i: number) => i === 0 || i === doctor.full_name?.split(' ').length - 1 ? name : '').join(' ')}
-                </div>
-
-                {/* Carimbo Azul Realista de Telemedicina */}
-                <div 
-                  className="border-[3px] border-double border-blue-600 text-blue-600 bg-white/70 p-3 rounded-lg flex flex-col items-center justify-center tracking-tight rotate-[1.5deg] max-w-[220px] select-none pointer-events-none shadow-[0_3px_6px_rgba(28,99,242,0.05)]"
-                  style={{ 
-                    borderColor: '#2563eb', 
-                    color: '#2563eb' 
-                  }}
-                >
-                  {/* Selo Validado */}
-                  <div className="absolute -top-2.5 -right-2 text-[7px] font-black border border-blue-600 bg-white px-1.5 py-0.5 rounded rotate-[15deg]">
-                    VALIDADO
-                  </div>
-                  
-                  <span className="text-[8px] font-black tracking-widest border-b border-blue-600/30 pb-0.5 mb-1.5 w-full text-center">
-                    VIRTUA DOC - TELEMEDICINA
-                  </span>
-                  
-                  {/* Brasão Médico Pequeno */}
-                  <svg className="h-4.5 w-4.5 fill-current mb-0.5" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
-                  </svg>
-                  
-                  <span className="text-[10px] font-extrabold tracking-wide uppercase truncate max-w-[190px]">
-                    {doctor.full_name}
-                  </span>
-                  <span className="text-[8.5px] font-bold">
-                    CRM: {doctor.crm}
-                  </span>
-                  <span className="text-[7.5px] font-bold tracking-wider opacity-90 mt-0.5">
-                    {doctor.specialties}
-                  </span>
-                </div>
+              {/* Box de Assinatura Limpo e Profissional para Gov.br */}
+              <div className="flex flex-col items-center">
+                <div className="w-48 sm:w-64 h-[1px] bg-gray-300 mb-2" />
+                <p className="text-[11px] sm:text-xs font-bold text-gray-800">{doctor.full_name}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-tighter">Médico Responsável / CRM: {doctor.crm}</p>
+                <p className="text-[8px] text-gray-400 mt-0.5 uppercase tracking-widest">{doctor.specialties}</p>
               </div>
             </div>
           </div>

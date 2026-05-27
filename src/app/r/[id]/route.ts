@@ -28,27 +28,32 @@ export async function GET(
     const isExam = data?.medications && !Array.isArray(data.medications) && data.medications.type === 'exam'
 
     if (data?.is_signed && data?.signed_file_url) {
-      // PROXY: Em vez de redirecionar (que pode falhar em iPhones/Safari), 
-      // buscamos o PDF e servimos diretamente do nosso domínio.
-      const pdfResponse = await fetch(data.signed_file_url)
-      
-      if (!pdfResponse.ok) {
-        throw new Error('Falha ao buscar o PDF original')
+      try {
+        // PROXY: Em vez de redirecionar (que pode falhar em iPhones/Safari), 
+        // buscamos o PDF e servimos diretamente do nosso domínio.
+        const pdfResponse = await fetch(data.signed_file_url)
+        
+        if (!pdfResponse.ok) {
+          throw new Error('Falha ao buscar o PDF original')
+        }
+
+        const pdfBuffer = await pdfResponse.arrayBuffer()
+        const fileName = isExam ? 'aso-ocupacional.pdf' : 'receita-digital.pdf'
+
+        return new Response(pdfBuffer, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `inline; filename="${fileName}"`,
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        })
+      } catch (proxyError) {
+        console.error('Proxy fetch failed, redirecting client directly to Supabase URL:', proxyError)
+        return redirect(data.signed_file_url)
       }
-
-      const pdfBuffer = await pdfResponse.arrayBuffer()
-      const fileName = isExam ? 'aso-ocupacional.pdf' : 'receita-digital.pdf'
-
-      return new Response(pdfBuffer, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `inline; filename="${fileName}"`,
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-        },
-      })
     }
 
     // Se não achar o PDF assinado, redireciona para a página de visualização correspondente.

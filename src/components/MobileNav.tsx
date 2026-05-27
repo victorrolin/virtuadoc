@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, Activity, LayoutDashboard, Calendar, Video, UserCircle, FileText, Stethoscope, Settings, LogOut, LucideIcon } from 'lucide-react'
+import { Menu, X, Activity, LayoutDashboard, Calendar, Video, UserCircle, FileText, Stethoscope, Settings, LogOut, LucideIcon, ClipboardList } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface NavItem {
@@ -32,6 +32,7 @@ export function MobileNav({ role, firstName, signOut }: MobileNavProps) {
       { href: '/dashboard/consultas', label: 'Salas de Vídeo', icon: Video },
       { href: '/dashboard/perfil', label: 'Meu Perfil', icon: UserCircle },
       { href: '/dashboard/receitas', label: 'Histórico de Receitas', icon: FileText },
+      { href: '/dashboard/exames', label: 'Histórico de Exames', icon: ClipboardList },
       { href: '/dashboard/assistente', label: 'Dr. Virtua (IA)', icon: Stethoscope, variant: 'primary' }
     )
   }

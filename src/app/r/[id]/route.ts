@@ -21,9 +21,11 @@ export async function GET(
     
     const { data, error } = await supabase
       .from('prescriptions')
-      .select('signed_file_url, is_signed')
+      .select('id, signed_file_url, is_signed, medications')
       .or(`id.eq.${id},appointment_id.eq.${id}`)
       .maybeSingle()
+
+    const isExam = data?.medications && !Array.isArray(data.medications) && data.medications.type === 'exam'
 
     if (data?.is_signed && data?.signed_file_url) {
       // PROXY: Em vez de redirecionar (que pode falhar em iPhones/Safari), 
@@ -35,12 +37,13 @@ export async function GET(
       }
 
       const pdfBuffer = await pdfResponse.arrayBuffer()
+      const fileName = isExam ? 'aso-ocupacional.pdf' : 'receita-digital.pdf'
 
       return new Response(pdfBuffer, {
         status: 200,
         headers: {
           'Content-Type': 'application/pdf',
-          'Content-Disposition': 'inline; filename="receita-digital.pdf"',
+          'Content-Disposition': `inline; filename="${fileName}"`,
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           'Pragma': 'no-cache',
           'Expires': '0',
@@ -48,9 +51,13 @@ export async function GET(
       })
     }
 
-    // Se não achar o PDF assinado, redireciona para a página de visualização da receita.
+    // Se não achar o PDF assinado, redireciona para a página de visualização correspondente.
     const baseUrl = new URL(request.url).origin
-    return redirect(`${baseUrl}/prescriptions/${id}`)
+    const docId = data?.id || id
+    if (isExam) {
+      return redirect(`${baseUrl}/exams/${docId}`)
+    }
+    return redirect(`${baseUrl}/prescriptions/${docId}`)
   } catch (error) {
     console.error('Redirect/Proxy error:', error)
     return redirect('/')

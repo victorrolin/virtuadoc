@@ -19,7 +19,13 @@ export async function getPrescriptionHistory() {
 
     if (error) throw error
 
-    return { success: true, prescriptions: data }
+    // Filtrar para excluir exames ocupacionais do histórico de receitas
+    const prescriptions = (data || []).filter((p: any) => {
+      const isExam = p.medications && !Array.isArray(p.medications) && p.medications.type === 'exam'
+      return !isExam
+    })
+
+    return { success: true, prescriptions }
   } catch (error: any) {
     console.error('Error fetching prescriptions:', error)
     return { success: false, error: error.message }

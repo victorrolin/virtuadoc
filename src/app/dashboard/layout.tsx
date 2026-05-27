@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircle, Stethoscope, FileText } from 'lucide-react'
+import { Activity, LayoutDashboard, Calendar, Video, Settings, LogOut, UserCircle, Stethoscope, FileText, ClipboardList } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import { BackButton } from '@/components/BackButton'
 import { SidebarPrescriptionButton } from '@/components/SidebarPrescriptionButton'
+import { SidebarExamButton } from '@/components/SidebarExamButton'
 import { MobileNav } from '@/components/MobileNav'
 
 export default async function DashboardLayout({
@@ -70,10 +71,16 @@ export default async function DashboardLayout({
                 
                 <div className="pt-2 pb-2 space-y-2">
                   <SidebarPrescriptionButton doctorName={profile?.full_name || 'Médico'} />
+                  <SidebarExamButton doctorName={profile?.full_name || 'Médico'} />
                   
                   <Link href="/dashboard/receitas" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
                     <FileText className="h-5 w-5" />
                     Histórico de Receitas
+                  </Link>
+
+                  <Link href="/dashboard/exames" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium transition-colors">
+                    <ClipboardList className="h-5 w-5" />
+                    Histórico de Exames
                   </Link>
                 </div>
 

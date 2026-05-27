@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Calendar, Users, Video, Clock, ArrowRight, Activity, Edit3, Zap, Radio, Star } from 'lucide-react'
 import Link from 'next/link'
 import { DashboardPrescriptionButton } from '@/components/DashboardPrescriptionButton'
+import { DashboardExamButton } from '@/components/DashboardExamButton'
 import { CountdownTimer } from '@/components/CountdownTimer'
 import Image from 'next/image'
 
@@ -409,6 +410,7 @@ export default async function DashboardPage() {
         {isDoctor && (
           <div className="space-y-6">
             <DashboardPrescriptionButton doctorName={profile?.full_name || 'Médico'} />
+            <DashboardExamButton doctorName={profile?.full_name || 'Médico'} />
 
             <div className="glass rounded-2xl p-6 border border-primary/20 bg-primary/5 relative overflow-hidden">
               <div className="absolute -top-6 -right-6 h-20 w-20 bg-primary/10 rounded-full blur-2xl"></div>

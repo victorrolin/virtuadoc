@@ -50,20 +50,37 @@ function CheckoutContent() {
     return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
   }
 
-  // Polling de status do MP (Checkout Pro)
-  const startPolling = useCallback((externalRef: string) => {
+  // Polling de status do MP (Checkout Pro ou Pix inline)
+  const startPolling = useCallback((params: { externalRef?: string; paymentId?: string }) => {
     if (pollingRef.current) clearInterval(pollingRef.current)
     pollingRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`/api/checkout/status?external_reference=${externalRef}`)
+        const query = params.paymentId 
+          ? `payment_id=${params.paymentId}` 
+          : `external_reference=${params.externalRef}`
+          
+        const res = await fetch(`/api/checkout/status?${query}`)
         const data = await res.json()
+        
         if (data.status === 'approved') {
           clearInterval(pollingRef.current!)
-          router.push(`/pagamento/sucesso?payment_id=${data.id}`)
+          if (params.paymentId) {
+            setPixStatus('approved')
+            setTimeout(() => {
+              router.push(`/pagamento/sucesso?payment_id=${data.id}`)
+            }, 2000)
+          } else {
+            router.push(`/pagamento/sucesso?payment_id=${data.id}`)
+          }
+        } else if (data.status === 'rejected' || data.status === 'cancelled') {
+          if (params.paymentId) {
+            setPixStatus('rejected')
+            clearInterval(pollingRef.current!)
+          }
         }
       } catch { /* continua tentando */ }
     }, 5000)
-  }, [router])
+  }, [router, setPixStatus])
 
   useEffect(() => () => { if (pollingRef.current) clearInterval(pollingRef.current) }, [])
 
@@ -71,30 +88,81 @@ function CheckoutContent() {
     e.preventDefault()
     setLoading(true)
     
-    // Abre a janela de forma síncrona para não ser bloqueada pelo pop-up blocker
-    const newWindow = window.open('about:blank', '_blank')
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    
+    // Se for Pix, chamamos o endpoint de Pix direto (Checkout Transparente)
+    if (paymentMethod === 'pix') {
+      try {
+        const res = await fetch('/api/checkout/pix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty }),
+        })
+        const data = await res.json()
+        if (data.success && data.paymentId) {
+          setPixData({
+            paymentId: data.paymentId,
+            qrCode: data.qrCode,
+            qrCodeBase64: data.qrCodeBase64,
+            meetLink: data.meetLink
+          })
+          setPixStatus('pending')
+          setStep('pix')
+          
+          // Inicia polling com o paymentId
+          startPolling({ paymentId: data.paymentId })
+        } else {
+          alert('Erro ao gerar Pix: ' + (data.error || 'Tente novamente'))
+        }
+      } catch (err) {
+        console.error('Erro de conexão ao gerar Pix:', err)
+        alert('Erro de conexão. Tente novamente.')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
+    // Para outros métodos (Cartão, Boleto), usamos Checkout Pro
+    let newWindow: Window | null = null
+    
+    if (!isMobile) {
+      try {
+        // Abre a janela de forma síncrona para não ser bloqueada pelo pop-up blocker no desktop
+        newWindow = window.open('about:blank', '_blank')
+      } catch (err) {
+        console.error('Falha ao abrir nova aba:', err)
+      }
+    }
     
     try {
-      // Todos os métodos usam o Checkout Pro do MP
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty, paymentMethod }),
       })
       const data = await res.json()
+      
       if (data.success && data.checkoutUrl) {
         setMpCheckoutUrl(data.checkoutUrl)
-        setStep('mp_opened')
         
-        // Inicia o polling na aba original
-        if (data.externalReference) {
-          startPolling(data.externalReference)
-        }
-
-        if (newWindow) {
-          newWindow.location.href = data.checkoutUrl
+        if (isMobile) {
+          // No celular, redireciona diretamente na mesma aba para evitar pop-up blocker
+          window.location.assign(data.checkoutUrl)
         } else {
-          window.open(data.checkoutUrl, '_blank')
+          // No computador
+          if (newWindow) {
+            newWindow.location.href = data.checkoutUrl
+            setStep('mp_opened')
+            
+            // Inicia o polling na aba original
+            if (data.externalReference) {
+              startPolling({ externalRef: data.externalReference })
+            }
+          } else {
+            // Se o popup blocker do desktop bloqueou a nova aba síncrona
+            window.location.assign(data.checkoutUrl)
+          }
         }
       } else {
         if (newWindow) newWindow.close()
@@ -321,7 +389,7 @@ function CheckoutContent() {
                   ].map(f => (
                     <div key={f.key} className={f.col === 2 ? 'md:col-span-2' : ''}>
                       <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">{f.label}</label>
-                      <input required type={f.type} value={(form as any)[f.key]} onChange={e => handleInputChange(f.key, e.target.value)}
+                      <input required type={f.type} value={form[f.key as keyof typeof form]} onChange={e => handleInputChange(f.key, e.target.value)}
                         pattern={f.pattern} title={f.title}
                         className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
                         placeholder={f.ph} />

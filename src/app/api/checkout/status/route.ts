@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 // Polling: verifica status de um pagamento MP
 export async function GET(req: NextRequest) {
   const paymentId = req.nextUrl.searchParams.get('payment_id')

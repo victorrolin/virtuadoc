@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 // Cria pagamento Pix diretamente via MP Payments API
 // O usuário NUNCA sai da nossa página
 export async function POST(req: NextRequest) {

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { sendConfirmationEmail, sendDoctorNotificationEmail } from '@/lib/email'
 import { sendWhatsAppMessage } from '@/lib/whatsapp'

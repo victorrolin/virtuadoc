@@ -6,7 +6,6 @@ import { uploadSignedPrescription } from '@/app/actions/uploadPrescription'
 import { deletePrescription } from '@/app/actions/deletePrescription'
 import { createClient } from '@/lib/supabase/client'
 import { Briefcase, Search, Send, Download, Loader2, User, CheckCircle2, Trash2 } from 'lucide-react'
-import Link from 'next/link'
 import { useToast } from '@/components/Toast'
 
 export default function ExamHistoryPage() {
@@ -175,18 +174,24 @@ export default function ExamHistoryPage() {
 
                   <div className="pt-4 flex flex-col gap-2">
                     <div className="flex gap-2">
-                      <Link 
-                        href={`${link}?print=true`}
+                      {/* Ver ASO: se já assinado, abre o PDF assinado diretamente */}
+                      <a 
+                        href={p.is_signed && p.signed_file_url ? p.signed_file_url : `${link}?print=true`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="flex-1 bg-white/5 hover:bg-secondary/20 text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all"
                       >
-                        <Download className="h-3.5 w-3.5" /> Ver ASO
-                      </Link>
+                        <Download className="h-3.5 w-3.5" /> {p.is_signed ? 'PDF Assinado' : 'Ver ASO'}
+                      </a>
                       
                       <button
                         onClick={() => {
-                          const shortLink = `${window.location.origin}/r/${p.id}.pdf?v=${Date.now()}`
-                          const text = `Olá ${p.patient_name}, aqui está seu ASO ${p.is_signed ? 'ASSINADO' : ''}: ${shortLink}`
+                          // Se assinado: link direto para o PDF assinado no Supabase
+                          // Se não assinado: usa o link curto /r/[id].pdf para o paciente ver a página
+                          const shareLink = p.is_signed && p.signed_file_url
+                            ? p.signed_file_url
+                            : `${window.location.origin}/r/${p.id}.pdf?v=${Date.now()}`
+                          const text = `Olá ${p.patient_name}, aqui está seu ASO ${p.is_signed ? 'DIGITAL ASSINADO' : 'DIGITAL'} emitido pela VirtuaDoc: ${shareLink}`
                           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
                         }}
                         className="flex-1 bg-secondary/10 hover:bg-secondary text-secondary hover:text-black text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all"

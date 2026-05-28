@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/supabase/service'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -19,8 +19,8 @@ export async function GET(
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
 
   try {
-    // Usar Service Client para ignorar RLS e encontrar a receita para o paciente (que não está logado)
-    const supabase = createServiceClient()
+    // A tabela prescriptions tem acesso público de leitura, podemos usar o client normal
+    const supabase = await createClient()
     
     const { data, error } = await supabase
       .from('prescriptions')
@@ -73,9 +73,13 @@ export async function GET(
     }
     return NextResponse.redirect(`${baseUrl}/prescriptions/${docId}`)
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Redirect/Proxy error:', error)
-    // Último recurso: vai para a home (não deveria chegar aqui normalmente)
-    return NextResponse.redirect(`${baseUrl}/`)
+    // Retorna o erro real para podermos debugar em vez de redirecionar silenciosamente para a landing page
+    return NextResponse.json({ 
+      error: 'Erro interno na rota /r', 
+      message: error?.message || 'Erro desconhecido',
+      id_received: id
+    }, { status: 500 })
   }
 }

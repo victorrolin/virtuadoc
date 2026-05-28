@@ -264,7 +264,7 @@ export default async function ExamPage({
                   </div>
                   
                   <p className="text-[11px] sm:text-xs font-black text-gray-900 z-10">{doctor.full_name}</p>
-                  <p className="text-[9px] sm:text-[10px] text-gray-600 uppercase font-bold mt-0.5 z-10 bg-gray-100 px-2 py-0.5 rounded">Médico do Trabalho</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-600 uppercase font-bold mt-0.5 z-10 bg-gray-100 px-2 py-0.5 rounded">{doctor.specialties}</p>
                   <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mt-0.5 z-10">CRM: {doctor.crm}</p>
                 </div>
               </div>

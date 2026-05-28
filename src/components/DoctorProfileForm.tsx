@@ -136,6 +136,28 @@ export function DoctorProfileForm({ profile }: Props) {
           </div>
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-1.5">
+              Especialidade (ex: Clínico Geral, Médico do Trabalho)
+            </label>
+            <input
+              name="specialties"
+              defaultValue={profile.specialties || ''}
+              placeholder="Ex: Clínico Geral"
+              className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-1.5">
+              CRM
+            </label>
+            <input
+              name="crm"
+              defaultValue={profile.crm || ''}
+              placeholder="Ex: 123456-SP"
+              className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-1.5">
               Bio / Apresentação
             </label>
             <textarea

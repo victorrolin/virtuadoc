@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 
 export async function updateDoctorProfile(formData: FormData) {
@@ -11,16 +10,18 @@ export async function updateDoctorProfile(formData: FormData) {
 
   const bio = formData.get('bio') as string
   const fullName = formData.get('fullName') as string
+  const specialties = formData.get('specialties') as string
+  const crm = formData.get('crm') as string
 
-  const adminClient = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
-
-  const { error } = await adminClient
+  // A tabela profiles deve permitir update pelo próprio usuário via RLS
+  const { error } = await supabase
     .from('profiles')
-    .update({ bio: bio || null, full_name: fullName })
+    .update({ 
+      bio: bio || null, 
+      full_name: fullName,
+      specialties: specialties || null,
+      crm: crm || null
+    })
     .eq('id', user.id)
 
   if (error) return { error: error.message }

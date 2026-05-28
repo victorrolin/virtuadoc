@@ -1,5 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/service'
-import { redirect } from 'next/navigation'
+import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -15,6 +15,8 @@ export async function GET(
     id = id.replace('.pdf', '')
   }
 
+  const baseUrl = new URL(request.url).origin
+
   try {
     // Usar Service Client para ignorar RLS e encontrar a receita para o paciente (que não está logado)
     const supabase = createServiceClient()
@@ -25,18 +27,18 @@ export async function GET(
       .or(`id.eq.${id},appointment_id.eq.${id}`)
       .maybeSingle()
 
+    // Detectar se é um exame (ASO) pelo campo isExam no JSON de medications
     let isExam = false
     try {
       const meds = typeof data?.medications === 'string' ? JSON.parse(data.medications) : data?.medications
-      isExam = meds && meds.isExam === true
+      isExam = !!(meds && meds.isExam === true)
     } catch (e) {
       isExam = false
     }
 
+    // Se o documento está assinado e tem URL do PDF, servir o PDF diretamente (proxy)
     if (data?.is_signed && data?.signed_file_url) {
       try {
-        // PROXY: Em vez de redirecionar (que pode falhar em iPhones/Safari), 
-        // buscamos o PDF e servimos diretamente do nosso domínio.
         const pdfResponse = await fetch(data.signed_file_url)
         
         if (!pdfResponse.ok) {
@@ -58,19 +60,21 @@ export async function GET(
         })
       } catch (proxyError) {
         console.error('Proxy fetch failed, redirecting client directly to Supabase URL:', proxyError)
-        return redirect(data.signed_file_url)
+        // Usa NextResponse.redirect() que NÃO lança exceção
+        return NextResponse.redirect(data.signed_file_url)
       }
     }
 
-    // Se não achar o PDF assinado, redireciona para a página de visualização correspondente.
-    const baseUrl = new URL(request.url).origin
+    // Se não achar o PDF assinado, redireciona para a página de visualização correspondente
     const docId = data?.id || id
     if (isExam) {
-      return redirect(`${baseUrl}/exames/${docId}`)
+      return NextResponse.redirect(`${baseUrl}/exames/${docId}`)
     }
-    return redirect(`${baseUrl}/prescriptions/${docId}`)
+    return NextResponse.redirect(`${baseUrl}/prescriptions/${docId}`)
+
   } catch (error) {
     console.error('Redirect/Proxy error:', error)
-    return redirect('/')
+    // Último recurso: vai para a home (não deveria chegar aqui normalmente)
+    return NextResponse.redirect(`${baseUrl}/`)
   }
 }

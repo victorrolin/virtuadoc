@@ -32,6 +32,25 @@ export function ExamModal({ isOpen, onClose, doctorName }: ExamModalProps) {
   const [signedUrl, setSignedUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
+  // Resetar todo o estado quando o modal abre
+  useEffect(() => {
+    if (isOpen) {
+      setPatientName('')
+      setPatientCpf('')
+      setCompanyName('')
+      setRole('')
+      setExamType('Admissional')
+      setRisks('')
+      setOpinion('Apto')
+      setNotes('')
+      setResult(null)
+      setIsSigned(false)
+      setSignedUrl(null)
+      setIsUploading(false)
+      setIsGenerating(false)
+    }
+  }, [isOpen])
+
   const handleGenerate = async () => {
     if (!patientName || !companyName || !role) {
       alert('Por favor, preencha nome do paciente, empresa e função.')
@@ -164,6 +183,26 @@ export function ExamModal({ isOpen, onClose, doctorName }: ExamModalProps) {
                       Para que o ASO tenha validade, você deve baixar o PDF e assiná-lo digitalmente no portal <a href="https://assinador.iti.br" target="_blank" className="text-secondary hover:underline">assinador.iti.br</a> usando seu e-CPF.
                     </p>
                   </div>
+
+                  {/* Botão para gerar um novo ASO */}
+                  <button
+                    onClick={() => {
+                      setResult(null)
+                      setIsSigned(false)
+                      setSignedUrl(null)
+                      setPatientName('')
+                      setPatientCpf('')
+                      setCompanyName('')
+                      setRole('')
+                      setExamType('Admissional')
+                      setRisks('')
+                      setOpinion('Apto')
+                      setNotes('')
+                    }}
+                    className="w-full py-2 text-xs text-gray-500 hover:text-secondary transition-colors font-semibold tracking-wider uppercase"
+                  >
+                    + Emitir Novo ASO
+                  </button>
 
                   <div className="flex flex-col w-full gap-3">
                     <div className="grid grid-cols-2 gap-3">

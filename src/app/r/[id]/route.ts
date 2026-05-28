@@ -15,7 +15,8 @@ export async function GET(
     id = id.replace('.pdf', '')
   }
 
-  const baseUrl = new URL(request.url).origin
+  // Usar a URL pública configurada — request.url retorna 0.0.0.0:3000 dentro do Docker
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://virtuadoc.automatech.tech'
 
   try {
     // Usar Service Client para ignorar RLS e encontrar a receita para o paciente (que não está logado)

@@ -71,18 +71,8 @@ function CheckoutContent() {
     e.preventDefault()
     setLoading(true)
     
-    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    
-    let newWindow: Window | null = null
-    
-    if (!isMobile) {
-      try {
-        // Abre a janela de forma síncrona para não ser bloqueada pelo pop-up blocker no desktop
-        newWindow = window.open('about:blank', '_blank')
-      } catch (err) {
-        console.error('Falha ao abrir nova aba:', err)
-      }
-    }
+    // Abre a janela de forma síncrona para não ser bloqueada pelo pop-up blocker
+    const newWindow = window.open('about:blank', '_blank')
     
     try {
       // Todos os métodos usam o Checkout Pro do MP
@@ -92,27 +82,19 @@ function CheckoutContent() {
         body: JSON.stringify({ doctorId, date, time, ...form, price, doctorName, specialty, paymentMethod }),
       })
       const data = await res.json()
-      
       if (data.success && data.checkoutUrl) {
         setMpCheckoutUrl(data.checkoutUrl)
+        setStep('mp_opened')
         
-        if (isMobile) {
-          // No celular, redireciona diretamente na mesma aba para evitar pop-up blocker
-          window.location.assign(data.checkoutUrl)
+        // Inicia o polling na aba original
+        if (data.externalReference) {
+          startPolling(data.externalReference)
+        }
+
+        if (newWindow) {
+          newWindow.location.href = data.checkoutUrl
         } else {
-          // No computador
-          if (newWindow) {
-            newWindow.location.href = data.checkoutUrl
-            setStep('mp_opened')
-            
-            // Inicia o polling na aba original
-            if (data.externalReference) {
-              startPolling(data.externalReference)
-            }
-          } else {
-            // Se o popup blocker do desktop bloqueou a nova aba síncrona
-            window.location.assign(data.checkoutUrl)
-          }
+          window.open(data.checkoutUrl, '_blank')
         }
       } else {
         if (newWindow) newWindow.close()
@@ -339,7 +321,7 @@ function CheckoutContent() {
                   ].map(f => (
                     <div key={f.key} className={f.col === 2 ? 'md:col-span-2' : ''}>
                       <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">{f.label}</label>
-                      <input required type={f.type} value={form[f.key as keyof typeof form]} onChange={e => handleInputChange(f.key, e.target.value)}
+                      <input required type={f.type} value={(form as any)[f.key]} onChange={e => handleInputChange(f.key, e.target.value)}
                         pattern={f.pattern} title={f.title}
                         className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
                         placeholder={f.ph} />
